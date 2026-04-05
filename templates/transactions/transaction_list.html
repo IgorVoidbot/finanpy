@@ -1,0 +1,256 @@
+{% extends 'base_app.html' %}
+
+{% block app_title %}Minhas Transações{% endblock %}
+
+{% block page_content %}
+<!-- Cabeçalho -->
+<div class="mb-6 flex items-center justify-between">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-100">Minhas Transações</h1>
+        <p class="text-sm text-gray-400 mt-1">Acompanhe e gerencie todas as suas movimentações financeiras.</p>
+    </div>
+    <a
+        href="{% url 'transactions:transaction_create' %}"
+        class="bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2.5 px-6 rounded-lg transition-colors duration-200"
+    >
+        Nova Transação
+    </a>
+</div>
+
+<!-- Barra de filtros -->
+<div class="bg-gray-900 border border-gray-700 rounded-xl p-4 mb-6">
+    <form method="get" novalidate>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+
+            <!-- De -->
+            <div>
+                <label for="id_date_from" class="block text-xs font-medium text-gray-400 mb-1">De</label>
+                <input
+                    type="date"
+                    name="date_from"
+                    id="id_date_from"
+                    value="{{ filters.date_from|default:'' }}"
+                    class="w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                >
+            </div>
+
+            <!-- Até -->
+            <div>
+                <label for="id_date_to" class="block text-xs font-medium text-gray-400 mb-1">Até</label>
+                <input
+                    type="date"
+                    name="date_to"
+                    id="id_date_to"
+                    value="{{ filters.date_to|default:'' }}"
+                    class="w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                >
+            </div>
+
+            <!-- Tipo -->
+            <div>
+                <label for="id_transaction_type" class="block text-xs font-medium text-gray-400 mb-1">Tipo</label>
+                <select
+                    name="transaction_type"
+                    id="id_transaction_type"
+                    class="w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                >
+                    <option value="">Todos os tipos</option>
+                    <option value="income" {% if filters.transaction_type == 'income' %}selected{% endif %}>Entrada</option>
+                    <option value="expense" {% if filters.transaction_type == 'expense' %}selected{% endif %}>Saída</option>
+                </select>
+            </div>
+
+            <!-- Conta -->
+            <div>
+                <label for="id_account" class="block text-xs font-medium text-gray-400 mb-1">Conta</label>
+                <select
+                    name="account"
+                    id="id_account"
+                    class="w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                >
+                    <option value="">Todas as contas</option>
+                    {% for account in accounts %}
+                        <option value="{{ account.pk }}" {% if filters.account == account.pk|stringformat:'s' %}selected{% endif %}>
+                            {{ account.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Categoria -->
+            <div>
+                <label for="id_category" class="block text-xs font-medium text-gray-400 mb-1">Categoria</label>
+                <select
+                    name="category"
+                    id="id_category"
+                    class="w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                >
+                    <option value="">Todas as categorias</option>
+                    {% for category in categories %}
+                        <option value="{{ category.pk }}" {% if filters.category == category.pk|stringformat:'s' %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+        </div>
+
+        <div class="mt-4 flex justify-end">
+            <button
+                type="submit"
+                class="bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2 px-5 rounded-lg text-sm transition-colors duration-200"
+            >
+                Filtrar
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Tabela de transações -->
+<div class="bg-gray-900 border border-gray-700 rounded-xl overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left">
+            <thead class="text-xs text-gray-400 uppercase bg-gray-800/50">
+                <tr>
+                    <th class="px-4 py-3 font-medium">Data</th>
+                    <th class="px-4 py-3 font-medium">Descrição</th>
+                    <th class="px-4 py-3 font-medium">Categoria</th>
+                    <th class="px-4 py-3 font-medium">Conta</th>
+                    <th class="px-4 py-3 font-medium">Tipo</th>
+                    <th class="px-4 py-3 font-medium text-right">Valor</th>
+                    <th class="px-4 py-3 font-medium text-right">Ações</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800">
+                {% for transaction in transactions %}
+                    <tr class="hover:bg-gray-800/40 transition-colors">
+
+                        <!-- Data -->
+                        <td class="px-4 py-3 text-gray-400 text-xs whitespace-nowrap">
+                            {{ transaction.date|date:'d/m/Y' }}
+                        </td>
+
+                        <!-- Descrição -->
+                        <td class="px-4 py-3 text-gray-100 font-medium">
+                            {{ transaction.description }}
+                        </td>
+
+                        <!-- Categoria -->
+                        <td class="px-4 py-3 text-gray-300">
+                            {{ transaction.category.name }}
+                        </td>
+
+                        <!-- Conta -->
+                        <td class="px-4 py-3 text-gray-300">
+                            {{ transaction.account.name }}
+                        </td>
+
+                        <!-- Tipo (badge) -->
+                        <td class="px-4 py-3">
+                            {% if transaction.transaction_type == 'income' %}
+                                <span class="bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded text-xs font-medium">
+                                    Entrada
+                                </span>
+                            {% else %}
+                                <span class="bg-rose-500/20 text-rose-400 px-2 py-1 rounded text-xs font-medium">
+                                    Saída
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Valor -->
+                        <td class="px-4 py-3 text-right font-medium whitespace-nowrap
+                            {% if transaction.transaction_type == 'income' %}text-emerald-400{% else %}text-rose-400{% endif %}">
+                            R$ {{ transaction.amount }}
+                        </td>
+
+                        <!-- Ações -->
+                        <td class="px-4 py-3 text-right">
+                            <div class="flex items-center justify-end gap-3">
+                                <a
+                                    href="{% url 'transactions:transaction_update' pk=transaction.pk %}"
+                                    class="text-violet-400 hover:text-violet-300 transition-colors duration-200"
+                                    title="Editar"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                </a>
+                                <a
+                                    href="{% url 'transactions:transaction_delete' pk=transaction.pk %}"
+                                    class="text-rose-400 hover:text-rose-300 transition-colors duration-200"
+                                    title="Excluir"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </td>
+
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7" class="px-4 py-16 text-center">
+                            <div class="flex flex-col items-center gap-3">
+                                <svg class="w-12 h-12 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                </svg>
+                                <p class="text-gray-300 font-medium">Nenhuma transação encontrada.</p>
+                                <p class="text-sm text-gray-500">Tente ajustar os filtros ou registre uma nova transação.</p>
+                                <a
+                                    href="{% url 'transactions:transaction_create' %}"
+                                    class="mt-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2.5 px-6 rounded-lg transition-colors duration-200"
+                                >
+                                    Registrar primeira transação
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Paginação -->
+{% if page_obj.has_other_pages %}
+    <div class="mt-6 flex items-center justify-between">
+        <p class="text-sm text-gray-400">
+            Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+        </p>
+        <div class="flex items-center gap-2">
+            {% if page_obj.has_previous %}
+                <a
+                    href="?page={{ page_obj.previous_page_number }}{% if filters.date_from %}&date_from={{ filters.date_from }}{% endif %}{% if filters.date_to %}&date_to={{ filters.date_to }}{% endif %}{% if filters.transaction_type %}&transaction_type={{ filters.transaction_type }}{% endif %}{% if filters.account %}&account={{ filters.account }}{% endif %}{% if filters.category %}&category={{ filters.category }}{% endif %}"
+                    class="bg-gray-800 hover:bg-gray-700 text-gray-100 px-3 py-1.5 rounded text-sm transition-colors duration-200"
+                >
+                    Anterior
+                </a>
+            {% else %}
+                <span class="bg-gray-800/50 text-gray-600 px-3 py-1.5 rounded text-sm cursor-not-allowed">
+                    Anterior
+                </span>
+            {% endif %}
+
+            {% if page_obj.has_next %}
+                <a
+                    href="?page={{ page_obj.next_page_number }}{% if filters.date_from %}&date_from={{ filters.date_from }}{% endif %}{% if filters.date_to %}&date_to={{ filters.date_to }}{% endif %}{% if filters.transaction_type %}&transaction_type={{ filters.transaction_type }}{% endif %}{% if filters.account %}&account={{ filters.account }}{% endif %}{% if filters.category %}&category={{ filters.category }}{% endif %}"
+                    class="bg-gray-800 hover:bg-gray-700 text-gray-100 px-3 py-1.5 rounded text-sm transition-colors duration-200"
+                >
+                    Próxima
+                </a>
+            {% else %}
+                <span class="bg-gray-800/50 text-gray-600 px-3 py-1.5 rounded text-sm cursor-not-allowed">
+                    Próxima
+                </span>
+            {% endif %}
+        </div>
+    </div>
+{% endif %}
+
+{% endblock %}

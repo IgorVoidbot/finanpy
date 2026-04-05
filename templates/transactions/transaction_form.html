@@ -1,0 +1,208 @@
+{% extends 'base_app.html' %}
+
+{% block app_title %}{% if object %}Editar Transação{% else %}Nova Transação{% endif %}{% endblock %}
+
+{% block page_content %}
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-100">
+        {% if object %}Editar Transação{% else %}Nova Transação{% endif %}
+    </h1>
+    <p class="text-sm text-gray-400 mt-1">Preencha os dados da transação.</p>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    <!-- Erros gerais (non_field_errors) -->
+    {% if form.non_field_errors %}
+        <div class="bg-rose-500/10 border border-rose-500/30 text-rose-400 rounded-lg px-4 py-3 text-sm mb-6">
+            {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="bg-gray-900 border border-gray-700 rounded-xl p-6 space-y-5">
+
+        <!-- Descrição -->
+        <div>
+            <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">
+                {{ form.description.label }}
+            </label>
+            <input
+                type="text"
+                name="{{ form.description.html_name }}"
+                id="{{ form.description.id_for_label }}"
+                value="{{ form.description.value|default:'' }}"
+                placeholder="Ex: Supermercado, Salário de março"
+                class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+            >
+            {% if form.description.errors %}
+                <div class="mt-1 text-sm text-rose-400">
+                    {% for error in form.description.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Valor e Data (linha de dois campos) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+            <!-- Valor -->
+            <div>
+                <label for="{{ form.amount.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">
+                    {{ form.amount.label }}
+                </label>
+                <input
+                    type="number"
+                    name="{{ form.amount.html_name }}"
+                    id="{{ form.amount.id_for_label }}"
+                    value="{{ form.amount.value|default:'' }}"
+                    step="0.01"
+                    min="0"
+                    placeholder="0,00"
+                    class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                >
+                {% if form.amount.errors %}
+                    <div class="mt-1 text-sm text-rose-400">
+                        {% for error in form.amount.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Data -->
+            <div>
+                <label for="{{ form.date.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">
+                    {{ form.date.label }}
+                </label>
+                <input
+                    type="date"
+                    name="{{ form.date.html_name }}"
+                    id="{{ form.date.id_for_label }}"
+                    value="{{ form.date.value|default:'' }}"
+                    class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                >
+                {% if form.date.errors %}
+                    <div class="mt-1 text-sm text-rose-400">
+                        {% for error in form.date.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <!-- Tipo de transação -->
+        <div>
+            <label for="{{ form.transaction_type.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">
+                {{ form.transaction_type.label }}
+            </label>
+            <select
+                name="{{ form.transaction_type.html_name }}"
+                id="{{ form.transaction_type.id_for_label }}"
+                class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+            >
+                {% for value, label in form.transaction_type.field.choices %}
+                    {% if value %}
+                        <option
+                            value="{{ value }}"
+                            {% if form.transaction_type.value == value %}selected{% endif %}
+                        >
+                            {{ label }}
+                        </option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            {% if form.transaction_type.errors %}
+                <div class="mt-1 text-sm text-rose-400">
+                    {% for error in form.transaction_type.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Conta e Categoria (linha de dois campos) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+            <!-- Conta -->
+            <div>
+                <label for="{{ form.account.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">
+                    {{ form.account.label }}
+                </label>
+                <select
+                    name="{{ form.account.html_name }}"
+                    id="{{ form.account.id_for_label }}"
+                    class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                >
+                    {% for value, label in form.account.field.choices %}
+                        <option
+                            value="{{ value }}"
+                            {% if form.account.value|stringformat:'s' == value|stringformat:'s' %}selected{% endif %}
+                        >
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+                {% if form.account.errors %}
+                    <div class="mt-1 text-sm text-rose-400">
+                        {% for error in form.account.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Categoria -->
+            <div>
+                <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">
+                    {{ form.category.label }}
+                </label>
+                <select
+                    name="{{ form.category.html_name }}"
+                    id="{{ form.category.id_for_label }}"
+                    class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                >
+                    {% for value, label in form.category.field.choices %}
+                        <option
+                            value="{{ value }}"
+                            {% if form.category.value|stringformat:'s' == value|stringformat:'s' %}selected{% endif %}
+                        >
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+                {% if form.category.errors %}
+                    <div class="mt-1 text-sm text-rose-400">
+                        {% for error in form.category.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <!-- Ações -->
+        <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-700">
+            <a
+                href="{% url 'transactions:transaction_list' %}"
+                class="bg-gray-700 hover:bg-gray-600 text-gray-100 font-medium py-2.5 px-6 rounded-lg transition-colors duration-200"
+            >
+                Cancelar
+            </a>
+            <button
+                type="submit"
+                class="bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2.5 px-6 rounded-lg transition-colors duration-200"
+            >
+                Salvar
+            </button>
+        </div>
+
+    </div>
+</form>
+{% endblock %}

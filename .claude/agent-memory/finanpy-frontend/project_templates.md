@@ -33,7 +33,7 @@ URL names referenced across templates (must exist in urls.py before templates wo
 - `users:login`, `users:signup` (namespace: users — used in auth templates)
 - `accounts:account_list`, `accounts:account_create`, `accounts:account_update`, `accounts:account_delete` (namespace: accounts)
 - `categories:category_list`, `categories:category_create`, `categories:category_update`, `categories:category_delete` (namespace: categories)
-- `transactions:list` (namespace: transactions)
+- `transactions:transaction_list`, `transactions:transaction_create`, `transactions:transaction_update`, `transactions:transaction_delete` (namespace: transactions)
 - `profiles:edit` (namespace: profiles)
 
 Categories templates (T10.3, T10.5, T10.8):
@@ -45,6 +45,11 @@ Accounts templates (T7.3, T7.5, T7.8):
 - `templates/accounts/account_list.html` — table with responsive overflow-x-auto, `get_account_type_display` for type badge, conditional emerald/rose coloring on `current_balance` via `>= 0` check, empty state with SVG bank icon
 - `templates/accounts/account_form.html` — shared create/edit form; `{% if object %}` gates the `initial_balance` field (hidden on edit); `<select>` iterates `form.account_type.field.choices` with `{% for value, label in ... %}`; selected option uses `form.account_type.value == value`
 - `templates/accounts/account_confirm_delete.html` — centered `max-w-lg mx-auto` card with rose warning icon SVG, `{{ object.name }}` in bold, standard POST form
+
+Transactions templates (T13.4, T13.6, T13.9):
+- `templates/transactions/transaction_list.html` — filter bar in 5-column responsive grid (date_from, date_to, transaction_type, account, category); filter `selected` state uses `|stringformat:'s'` comparison for FK pk values; pagination preserves filter params by repeating `{% if filters.X %}&X={{ filters.X }}{% endif %}` on each page link; edit action uses violet icon SVG, delete uses rose icon SVG; empty-state colspan="7"
+- `templates/transactions/transaction_form.html` — amount+date in `sm:grid-cols-2` grid; account+category in second `sm:grid-cols-2` grid; ModelChoiceField selects (account, category) use `|stringformat:'s'` on both sides of selected comparison since value is an int PK; transaction_type skips empty choice with `{% if value %}`
+- `templates/transactions/transaction_confirm_delete.html` — same centered max-w-lg card pattern as category/account confirm_delete; secondary warning note mentions account balance recalculation
 
 Active sidebar detection pattern:
 - Dashboard: `request.resolver_match.url_name == 'dashboard'`

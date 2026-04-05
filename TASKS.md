@@ -280,7 +280,7 @@
 
 ---
 
-### Sprint 4 — Transações
+### [X] Sprint 4 — Transações
 
 #### [X] T11. Model de Transação
 
@@ -308,24 +308,24 @@
 - [X] **T12.3** Configurar `transactions/apps.py` com `ready()` importando signals
 - [X] **T12.4** Testar: criar transações e verificar que saldo da conta atualiza corretamente
 
-#### T13. CRUD de Transações (Views e Templates)
+#### [X] T13. CRUD de Transações (Views e Templates)
 
-- [ ] **T13.1** Criar `transactions/forms.py` com `TransactionForm` (ModelForm)
+- [X] **T13.1** Criar `transactions/forms.py` com `TransactionForm` (ModelForm)
   - Campos: description, amount, date, transaction_type, account, category
   - Labels em português
   - Filtrar `account` e `category` pelo user no `__init__`
   - Widget de date com `type="date"`
   - Widget de amount com `step="0.01"`
-- [ ] **T13.2** Criar `TransactionListView` em `transactions/views.py`
+- [X] **T13.2** Criar `TransactionListView` em `transactions/views.py`
   - `LoginRequiredMixin` + `ListView`
   - Filtrar pelo user
   - Paginação: 20 por página
   - Template: `templates/transactions/transaction_list.html`
-- [ ] **T13.3** Implementar filtros na `TransactionListView`
+- [X] **T13.3** Implementar filtros na `TransactionListView`
   - Receber via GET: `date_from`, `date_to`, `transaction_type`, `account`, `category`
   - Aplicar filtros no `get_queryset()`
   - Passar filtros ativos ao contexto para manter estado no template
-- [ ] **T13.4** Criar template `templates/transactions/transaction_list.html`
+- [X] **T13.4** Criar template `templates/transactions/transaction_list.html`
   - Extender `base_app.html`
   - Título "Minhas Transações"
   - Barra de filtros no topo (inputs de data, selects de tipo/conta/categoria, botão filtrar)
@@ -333,25 +333,25 @@
   - Tabela responsiva: data, descrição, categoria, conta, valor (verde/vermelho), ações
   - Paginação estilizada no rodapé
   - Estado vazio
-- [ ] **T13.5** Criar `TransactionCreateView`
+- [X] **T13.5** Criar `TransactionCreateView`
   - `LoginRequiredMixin` + `CreateView`
   - Atribuir user no `form_valid`
   - Filtrar account/category pelo user via `get_form()`
   - Mensagem de sucesso
   - Template: `templates/transactions/transaction_form.html`
-- [ ] **T13.6** Criar template `templates/transactions/transaction_form.html`
+- [X] **T13.6** Criar template `templates/transactions/transaction_form.html`
   - Formulário estilizado, reutilizado para create/update
-- [ ] **T13.7** Criar `TransactionUpdateView`
+- [X] **T13.7** Criar `TransactionUpdateView`
   - Filtrar queryset pelo user
   - Mensagem de sucesso
-- [ ] **T13.8** Criar `TransactionDeleteView`
+- [X] **T13.8** Criar `TransactionDeleteView`
   - Filtrar queryset pelo user
   - Template: `templates/transactions/transaction_confirm_delete.html`
   - Mensagem de sucesso
-- [ ] **T13.9** Criar template de confirmação de exclusão
-- [ ] **T13.10** Configurar URLs em `transactions/urls.py`
+- [X] **T13.9** Criar template de confirmação de exclusão
+- [X] **T13.10** Configurar URLs em `transactions/urls.py`
   - `transacoes/`, `transacoes/nova/`, `transacoes/<pk>/editar/`, `transacoes/<pk>/excluir/`
-- [ ] **T13.11** Incluir `transactions.urls` em `core/urls.py`
+- [X] **T13.11** Incluir `transactions.urls` em `core/urls.py`
 
 ---
 
