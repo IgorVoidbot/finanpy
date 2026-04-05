@@ -153,9 +153,9 @@
 - [X] **T5.9** Configurar URLs em `profiles/urls.py` e incluir em `core/urls.py`
   - Rota: `perfil/`
 
-#### T6. Model de Conta Bancária
+#### [X] T6. Model de Conta Bancária
 
-- [ ] **T6.1** Criar model `Account` em `accounts/models.py`
+- [X] **T6.1** Criar model `Account` em `accounts/models.py`
   - `user = ForeignKey(User, on_delete=CASCADE, related_name='accounts')`
   - `name = CharField(max_length=100)`
   - `account_type = CharField(choices=ACCOUNT_TYPE_CHOICES)`
@@ -164,10 +164,10 @@
   - `current_balance = DecimalField(max_digits=10, decimal_places=2, default=0)`
   - Campos `created_at` e `updated_at`
   - Método `__str__` retornando nome da conta
-- [ ] **T6.2** Sobrescrever `save()` para que na criação `current_balance = initial_balance`
-- [ ] **T6.3** Registrar model no admin com `list_display`, `list_filter`
-- [ ] **T6.4** Executar `makemigrations accounts` e `migrate`
-- [ ] **T6.5** Testar criação de conta via admin
+- [X] **T6.2** Sobrescrever `save()` para que na criação `current_balance = initial_balance`
+- [X] **T6.3** Registrar model no admin com `list_display`, `list_filter`
+- [X] **T6.4** Executar `makemigrations accounts` e `migrate`
+- [X] **T6.5** Testar criação de conta via admin
 
 #### T7. CRUD de Contas Bancárias (Views e Templates)
 
