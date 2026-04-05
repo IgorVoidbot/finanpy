@@ -1,0 +1,78 @@
+{% extends 'base_auth.html' %}
+
+{% block auth_title %}Login{% endblock %}
+
+{% block auth_content %}
+<h1 class="text-xl font-bold text-gray-100 mb-6 text-center">Bem-vindo de volta</h1>
+
+{% if form.non_field_errors %}
+    <div class="bg-rose-500/10 border border-rose-500/30 text-rose-400 rounded-lg px-4 py-3 text-sm mb-4">
+        {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    <!-- E-mail -->
+    <div class="mb-4">
+        <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">
+            E-mail
+        </label>
+        <input
+            type="email"
+            name="{{ form.username.html_name }}"
+            id="{{ form.username.id_for_label }}"
+            value="{{ form.username.value|default:'' }}"
+            placeholder="joao@exemplo.com"
+            autocomplete="email"
+            class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+        >
+        {% if form.username.errors %}
+            <div class="text-rose-400 text-sm mt-1">
+                {% for error in form.username.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Senha -->
+    <div class="mb-6">
+        <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">
+            Senha
+        </label>
+        <input
+            type="password"
+            name="{{ form.password.html_name }}"
+            id="{{ form.password.id_for_label }}"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+        >
+        {% if form.password.errors %}
+            <div class="text-rose-400 text-sm mt-1">
+                {% for error in form.password.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <button
+        type="submit"
+        class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors"
+    >
+        Entrar
+    </button>
+</form>
+
+<p class="text-center text-sm text-gray-500 mt-6">
+    Não tem conta?
+    <a href="{% url 'users:signup' %}" class="text-emerald-400 hover:text-emerald-300 font-medium transition-colors">
+        Cadastre-se
+    </a>
+</p>
+{% endblock %}

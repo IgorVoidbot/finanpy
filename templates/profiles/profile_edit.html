@@ -1,0 +1,151 @@
+{% extends 'base_app.html' %}
+
+{% block app_title %}Meu Perfil{% endblock %}
+
+{% block page_content %}
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-100">Meu Perfil</h1>
+    <p class="text-sm text-gray-400 mt-1">Atualize suas informações pessoais e preferências.</p>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    <!-- Erros gerais (non_field_errors) -->
+    {% if user_form.non_field_errors or profile_form.non_field_errors %}
+        <div class="bg-rose-500/10 border border-rose-500/30 text-rose-400 rounded-lg px-4 py-3 text-sm mb-6">
+            {% for error in user_form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+            {% for error in profile_form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="bg-gray-900 border border-gray-700 rounded-xl p-6 space-y-6">
+
+        <!-- Seção: Informações Pessoais -->
+        <div>
+            <h2 class="text-lg font-semibold text-gray-100 mb-4 pb-3 border-b border-gray-700">
+                Informações Pessoais
+            </h2>
+
+            <!-- Nome e Sobrenome em grid 2 colunas -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+
+                <!-- Primeiro nome -->
+                <div>
+                    <label for="{{ user_form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">
+                        Nome
+                    </label>
+                    <input
+                        type="text"
+                        name="{{ user_form.first_name.html_name }}"
+                        id="{{ user_form.first_name.id_for_label }}"
+                        value="{{ user_form.first_name.value|default:'' }}"
+                        placeholder="João"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                    >
+                    {% if user_form.first_name.errors %}
+                        <div class="mt-1 text-sm text-rose-400">
+                            {% for error in user_form.first_name.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Sobrenome -->
+                <div>
+                    <label for="{{ user_form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">
+                        Sobrenome
+                    </label>
+                    <input
+                        type="text"
+                        name="{{ user_form.last_name.html_name }}"
+                        id="{{ user_form.last_name.id_for_label }}"
+                        value="{{ user_form.last_name.value|default:'' }}"
+                        placeholder="Silva"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                    >
+                    {% if user_form.last_name.errors %}
+                        <div class="mt-1 text-sm text-rose-400">
+                            {% for error in user_form.last_name.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+            </div>
+
+            <!-- E-mail -->
+            <div>
+                <label for="{{ user_form.email.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">
+                    E-mail
+                </label>
+                <input
+                    type="email"
+                    name="{{ user_form.email.html_name }}"
+                    id="{{ user_form.email.id_for_label }}"
+                    value="{{ user_form.email.value|default:'' }}"
+                    placeholder="joao@exemplo.com"
+                    autocomplete="email"
+                    class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                >
+                {% if user_form.email.errors %}
+                    <div class="mt-1 text-sm text-rose-400">
+                        {% for error in user_form.email.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Seção: Preferências -->
+        <div>
+            <h2 class="text-lg font-semibold text-gray-100 mb-4 pb-3 border-b border-gray-700">
+                Preferências
+            </h2>
+
+            <!-- Nome de exibição -->
+            <div>
+                <label for="{{ profile_form.display_name.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">
+                    Nome de exibição
+                </label>
+                <input
+                    type="text"
+                    name="{{ profile_form.display_name.html_name }}"
+                    id="{{ profile_form.display_name.id_for_label }}"
+                    value="{{ profile_form.display_name.value|default:'' }}"
+                    placeholder="Como você quer ser chamado"
+                    class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                >
+                {% if profile_form.display_name.errors %}
+                    <div class="mt-1 text-sm text-rose-400">
+                        {% for error in profile_form.display_name.errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <p class="mt-1.5 text-xs text-gray-500">
+                    Este nome é exibido na navegação e no painel.
+                </p>
+            </div>
+        </div>
+
+        <!-- Ações -->
+        <div class="flex items-center justify-end pt-2 border-t border-gray-700">
+            <button
+                type="submit"
+                class="bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2.5 px-6 rounded-lg transition-colors duration-200"
+            >
+                Salvar Alterações
+            </button>
+        </div>
+
+    </div>
+</form>
+{% endblock %}

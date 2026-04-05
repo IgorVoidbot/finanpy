@@ -1,0 +1,143 @@
+{% extends 'base_auth.html' %}
+
+{% block auth_title %}Cadastro{% endblock %}
+
+{% block auth_content %}
+<h1 class="text-xl font-bold text-gray-100 mb-6 text-center">Crie sua conta</h1>
+
+{% if form.non_field_errors %}
+    <div class="bg-rose-500/10 border border-rose-500/30 text-rose-400 rounded-lg px-4 py-3 text-sm mb-4">
+        {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 mb-4">
+        <!-- Primeiro nome -->
+        <div>
+            <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">
+                Nome
+            </label>
+            <input
+                type="text"
+                name="{{ form.first_name.html_name }}"
+                id="{{ form.first_name.id_for_label }}"
+                value="{{ form.first_name.value|default:'' }}"
+                placeholder="João"
+                class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+            >
+            {% if form.first_name.errors %}
+                <div class="text-rose-400 text-sm mt-1">
+                    {% for error in form.first_name.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Sobrenome -->
+        <div>
+            <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">
+                Sobrenome
+            </label>
+            <input
+                type="text"
+                name="{{ form.last_name.html_name }}"
+                id="{{ form.last_name.id_for_label }}"
+                value="{{ form.last_name.value|default:'' }}"
+                placeholder="Silva"
+                class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+            >
+            {% if form.last_name.errors %}
+                <div class="text-rose-400 text-sm mt-1">
+                    {% for error in form.last_name.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- E-mail -->
+    <div class="mb-4">
+        <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">
+            E-mail
+        </label>
+        <input
+            type="email"
+            name="{{ form.email.html_name }}"
+            id="{{ form.email.id_for_label }}"
+            value="{{ form.email.value|default:'' }}"
+            placeholder="joao@exemplo.com"
+            class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+        >
+        {% if form.email.errors %}
+            <div class="text-rose-400 text-sm mt-1">
+                {% for error in form.email.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Senha -->
+    <div class="mb-4">
+        <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">
+            Senha
+        </label>
+        <input
+            type="password"
+            name="{{ form.password1.html_name }}"
+            id="{{ form.password1.id_for_label }}"
+            placeholder="••••••••"
+            class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+        >
+        {% if form.password1.errors %}
+            <div class="text-rose-400 text-sm mt-1">
+                {% for error in form.password1.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Confirmar senha -->
+    <div class="mb-6">
+        <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">
+            Confirmar senha
+        </label>
+        <input
+            type="password"
+            name="{{ form.password2.html_name }}"
+            id="{{ form.password2.id_for_label }}"
+            placeholder="••••••••"
+            class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+        >
+        {% if form.password2.errors %}
+            <div class="text-rose-400 text-sm mt-1">
+                {% for error in form.password2.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <button
+        type="submit"
+        class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors"
+    >
+        Cadastrar
+    </button>
+</form>
+
+<p class="text-center text-sm text-gray-500 mt-6">
+    Já tem conta?
+    <a href="{% url 'users:login' %}" class="text-emerald-400 hover:text-emerald-300 font-medium transition-colors">
+        Faça login
+    </a>
+</p>
+{% endblock %}
