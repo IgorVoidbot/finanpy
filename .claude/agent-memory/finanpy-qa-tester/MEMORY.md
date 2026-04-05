@@ -1,0 +1,2 @@
+- [Test Data and Credentials](project_test_data.md) — working test credentials and users created during QA sessions
+- [Admin Behavior Notes](project_admin_behavior.md) — Django admin quirks including login redirect and add_fieldsets behavior

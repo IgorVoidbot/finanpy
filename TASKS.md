@@ -33,58 +33,58 @@
 - [X] **T1.12** Criar superusuário de desenvolvimento
   - `python manage.py createsuperuser`
 
-#### T2. Model de Usuário Customizado
+#### [X] T2. Model de Usuário Customizado
 
-- [ ] **T2.1** Criar model `User` em `users/models.py` herdando de `AbstractUser`
+- [X] **T2.1** Criar model `User` em `users/models.py` herdando de `AbstractUser`
   - Definir `email = EmailField(unique=True)`
   - Definir `USERNAME_FIELD = 'email'`
   - Definir `REQUIRED_FIELDS = ['first_name', 'last_name']`
   - Adicionar campos `created_at` (auto_now_add) e `updated_at` (auto_now)
-- [ ] **T2.2** Criar `UserManager` customizado em `users/managers.py`
+- [X] **T2.2** Criar `UserManager` customizado em `users/managers.py`
   - Herdar de `BaseUserManager`
   - Implementar `create_user()` com normalização de e-mail
   - Implementar `create_superuser()` com flags `is_staff` e `is_superuser`
-- [ ] **T2.3** Registrar model User no `users/admin.py`
+- [X] **T2.3** Registrar model User no `users/admin.py`
   - Configurar `list_display` com e-mail, nome, is_active
-- [ ] **T2.4** Executar `makemigrations users` e `migrate`
+- [X] **T2.4** Executar `makemigrations users` e `migrate`
   - Verificar que a migration foi criada corretamente
-- [ ] **T2.5** Testar criação de usuário via Django Admin
+- [X] **T2.5** Testar criação de usuário via Django Admin
   - Acessar `/admin/`, criar usuário com e-mail, verificar login
 
-#### T3. Templates Base e Landing Page
+#### [X] T3. Templates Base e Landing Page
 
-- [ ] **T3.1** Criar `templates/base.html` com estrutura HTML5 completa
+- [X] **T3.1** Criar `templates/base.html` com estrutura HTML5 completa
   - Incluir meta tags de viewport (responsividade)
   - Incluir TailwindCSS CDN e fonte Inter
   - Definir `{% block title %}`, `{% block content %}` e `{% block extra_js %}`
   - Aplicar `bg-gray-950 text-gray-100 font-sans min-h-screen`
-- [ ] **T3.2** Criar `templates/base_auth.html` extendendo `base.html`
+- [X] **T3.2** Criar `templates/base_auth.html` extendendo `base.html`
   - Layout centralizado para telas de login/cadastro (sem sidebar)
   - Card central com fundo `bg-gray-900`, borda `border-gray-700`, rounded
-- [ ] **T3.3** Criar `templates/base_app.html` extendendo `base.html`
+- [X] **T3.3** Criar `templates/base_app.html` extendendo `base.html`
   - Incluir navbar (componente) no topo
   - Incluir sidebar (componente) na lateral esquerda
   - Área de conteúdo principal com `{% block page_content %}`
   - Incluir componente de mensagens (Django messages)
-- [ ] **T3.4** Criar `templates/components/navbar.html`
+- [X] **T3.4** Criar `templates/components/navbar.html`
   - Logo "Finanpy" com gradient `from-emerald-400 to-violet-400`
   - Nome do usuário logado à direita
   - Link de logout
   - Responsivo: menu hambúrguer em mobile
-- [ ] **T3.5** Criar `templates/components/sidebar.html`
+- [X] **T3.5** Criar `templates/components/sidebar.html`
   - Links: Dashboard, Contas, Categorias, Transações, Perfil
   - Ícones SVG inline para cada item
   - Estado ativo com `text-emerald-400 bg-emerald-500/10`
   - `hidden md:block` (escondido em mobile)
-- [ ] **T3.6** Criar `templates/components/messages.html`
+- [X] **T3.6** Criar `templates/components/messages.html`
   - Renderizar `{% for message in messages %}` com estilo por tag (success, error, warning)
   - Auto-dismiss com JavaScript simples (setTimeout + fadeOut)
-- [ ] **T3.7** Criar `templates/landing.html`
+- [X] **T3.7** Criar `templates/landing.html`
   - Hero section: título com gradient, subtítulo, botões Cadastre-se e Entrar
   - Seção de funcionalidades: 3-4 cards com ícone + texto
   - Footer simples
   - Verificar se usuário está logado → redirecionar para dashboard
-- [ ] **T3.8** Configurar URL da landing page em `core/urls.py`
+- [X] **T3.8** Configurar URL da landing page em `core/urls.py`
   - Rota `''` apontando para view da landing page
 
 #### T4. Autenticação (Cadastro, Login, Logout)

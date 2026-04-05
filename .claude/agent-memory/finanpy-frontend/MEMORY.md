@@ -1,0 +1,1 @@
+- [Finanpy Template Structure](project_templates.md) — template hierarchy, block names, URL names, component locations, and active-sidebar detection pattern

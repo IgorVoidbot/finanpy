@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}{% block app_title %}Painel{% endblock %} | Finanpy{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-950 text-gray-100">
+
+    {% include 'components/navbar.html' %}
+
+    <div class="flex">
+
+        <aside class="hidden md:block w-64 flex-shrink-0">
+            {% include 'components/sidebar.html' %}
+        </aside>
+
+        <main class="flex-1 p-6 min-w-0">
+            {% include 'components/messages.html' %}
+            {% block page_content %}{% endblock %}
+        </main>
+
+    </div>
+
+</div>
+{% endblock %}
