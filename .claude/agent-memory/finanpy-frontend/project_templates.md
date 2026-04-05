@@ -32,9 +32,14 @@ URL names referenced across templates (must exist in urls.py before templates wo
 - `login`, `logout`, `signup` (root, no namespace — likely from users app)
 - `users:login`, `users:signup` (namespace: users — used in auth templates)
 - `accounts:account_list`, `accounts:account_create`, `accounts:account_update`, `accounts:account_delete` (namespace: accounts)
-- `categories:list` (namespace: categories)
+- `categories:category_list`, `categories:category_create`, `categories:category_update`, `categories:category_delete` (namespace: categories)
 - `transactions:list` (namespace: transactions)
 - `profiles:edit` (namespace: profiles)
+
+Categories templates (T10.3, T10.5, T10.8):
+- `templates/categories/category_list.html` — table with `overflow-x-auto`, transaction_type badge uses `{% if category.transaction_type == 'income' %}` to pick `bg-emerald-500/20 text-emerald-400` vs `bg-rose-500/20 text-rose-400`; `get_transaction_type_display` for label text; empty state with tag SVG icon; colspan="3"
+- `templates/categories/category_form.html` — shared create/edit form; `<select>` iterates `form.transaction_type.field.choices` skipping empty option with `{% if value %}`; no field gated behind `{% if object %}` (both create and edit use name + transaction_type)
+- `templates/categories/category_confirm_delete.html` — centered `max-w-lg mx-auto` card with rose warning icon SVG; shows `{{ object.name }}` and inline type badge (`get_transaction_type_display`) with emerald/rose coloring
 
 Accounts templates (T7.3, T7.5, T7.8):
 - `templates/accounts/account_list.html` — table with responsive overflow-x-auto, `get_account_type_display` for type badge, conditional emerald/rose coloring on `current_balance` via `>= 0` check, empty state with SVG bank icon

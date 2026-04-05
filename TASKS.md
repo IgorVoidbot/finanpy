@@ -219,7 +219,7 @@
 
 ---
 
-### Sprint 3 — Categorias e Categorias Padrão
+### [X] Sprint 3 — Categorias e Categorias Padrão
 
 #### [X] T8. Model de Categoria
 
@@ -244,39 +244,39 @@
 - [X] **T9.2** Configurar `categories/apps.py` com `ready()` importando signals
 - [X] **T9.3** Testar: criar novo usuário e verificar se categorias foram criadas
 
-#### T10. CRUD de Categorias (Views e Templates)
+#### [X] T10. CRUD de Categorias (Views e Templates)
 
-- [ ] **T10.1** Criar `categories/forms.py` com `CategoryForm` (ModelForm)
+- [X] **T10.1** Criar `categories/forms.py` com `CategoryForm` (ModelForm)
   - Campos: name, transaction_type
   - Labels em português
-- [ ] **T10.2** Criar `CategoryListView` em `categories/views.py`
+- [X] **T10.2** Criar `CategoryListView` em `categories/views.py`
   - `LoginRequiredMixin` + `ListView`
   - Filtrar pelo user
   - Template: `templates/categories/category_list.html`
-- [ ] **T10.3** Criar template `templates/categories/category_list.html`
+- [X] **T10.3** Criar template `templates/categories/category_list.html`
   - Extender `base_app.html`
   - Título "Minhas Categorias"
   - Botão "Nova Categoria"
   - Tabela com: nome, tipo (badge verde/vermelho), ações
   - Estado vazio com mensagem amigável
-- [ ] **T10.4** Criar `CategoryCreateView`
+- [X] **T10.4** Criar `CategoryCreateView`
   - `LoginRequiredMixin` + `CreateView`
   - Atribuir user no `form_valid`
   - Mensagem de sucesso
   - Template: `templates/categories/category_form.html`
-- [ ] **T10.5** Criar template `templates/categories/category_form.html`
+- [X] **T10.5** Criar template `templates/categories/category_form.html`
   - Formulário estilizado, reutilizado para create/update
-- [ ] **T10.6** Criar `CategoryUpdateView`
+- [X] **T10.6** Criar `CategoryUpdateView`
   - Filtrar queryset pelo user
   - Mensagem de sucesso
-- [ ] **T10.7** Criar `CategoryDeleteView`
+- [X] **T10.7** Criar `CategoryDeleteView`
   - Filtrar queryset pelo user
   - Impedir exclusão se houver transações vinculadas (verificar no `delete()` ou `form_valid()`)
   - Template: `templates/categories/category_confirm_delete.html`
-- [ ] **T10.8** Criar template de confirmação de exclusão
-- [ ] **T10.9** Configurar URLs em `categories/urls.py`
+- [X] **T10.8** Criar template de confirmação de exclusão
+- [X] **T10.9** Configurar URLs em `categories/urls.py`
   - `categorias/`, `categorias/nova/`, `categorias/<pk>/editar/`, `categorias/<pk>/excluir/`
-- [ ] **T10.10** Incluir `categories.urls` em `core/urls.py`
+- [X] **T10.10** Incluir `categories.urls` em `core/urls.py`
 
 ---
 
