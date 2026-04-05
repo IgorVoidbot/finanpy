@@ -169,53 +169,53 @@
 - [X] **T6.4** Executar `makemigrations accounts` e `migrate`
 - [X] **T6.5** Testar criação de conta via admin
 
-#### T7. CRUD de Contas Bancárias (Views e Templates)
+#### [X] T7. CRUD de Contas Bancárias (Views e Templates)
 
-- [ ] **T7.1** Criar `accounts/forms.py` com `AccountForm` (ModelForm)
+- [X] **T7.1** Criar `accounts/forms.py` com `AccountForm` (ModelForm)
   - Campos: name, account_type, initial_balance
   - Labels em português
   - Widget de initial_balance com step="0.01"
-- [ ] **T7.2** Criar `AccountListView` em `accounts/views.py`
+- [X] **T7.2** Criar `AccountListView` em `accounts/views.py`
   - `LoginRequiredMixin` + `ListView`
   - Filtrar `queryset` pelo `request.user`
   - Template: `templates/accounts/account_list.html`
-- [ ] **T7.3** Criar template `templates/accounts/account_list.html`
+- [X] **T7.3** Criar template `templates/accounts/account_list.html`
   - Extender `base_app.html`
   - Título "Minhas Contas"
   - Botão "Nova Conta" (link para create)
   - Tabela responsiva com: nome, tipo, saldo atual, ações (editar/excluir)
   - Valores positivos em verde, negativos em vermelho
   - Estado vazio: mensagem amigável "Nenhuma conta cadastrada"
-- [ ] **T7.4** Criar `AccountCreateView` em `accounts/views.py`
+- [X] **T7.4** Criar `AccountCreateView` em `accounts/views.py`
   - `LoginRequiredMixin` + `CreateView`
   - No `form_valid`, atribuir `user = request.user`
   - Mensagem de sucesso
   - Redirecionar para lista
   - Template: `templates/accounts/account_form.html`
-- [ ] **T7.5** Criar template `templates/accounts/account_form.html`
+- [X] **T7.5** Criar template `templates/accounts/account_form.html`
   - Extender `base_app.html`
   - Formulário estilizado conforme Design System
   - Reutilizado para create e update (título dinâmico)
-- [ ] **T7.6** Criar `AccountUpdateView` em `accounts/views.py`
+- [X] **T7.6** Criar `AccountUpdateView` em `accounts/views.py`
   - `LoginRequiredMixin` + `UpdateView`
   - Filtrar queryset pelo user para segurança
   - Campos editáveis: name, account_type (não initial_balance)
   - Mensagem de sucesso
   - Template reutilizado: `account_form.html`
-- [ ] **T7.7** Criar `AccountDeleteView` em `accounts/views.py`
+- [X] **T7.7** Criar `AccountDeleteView` em `accounts/views.py`
   - `LoginRequiredMixin` + `DeleteView`
   - Filtrar queryset pelo user
   - Template de confirmação: `templates/accounts/account_confirm_delete.html`
   - Mensagem de sucesso
-- [ ] **T7.8** Criar template `templates/accounts/account_confirm_delete.html`
+- [X] **T7.8** Criar template `templates/accounts/account_confirm_delete.html`
   - Modal/card de confirmação conforme Design System
   - Botões Cancelar e Excluir
-- [ ] **T7.9** Configurar URLs em `accounts/urls.py`
+- [X] **T7.9** Configurar URLs em `accounts/urls.py`
   - `contas/` → lista
   - `contas/nova/` → criar
   - `contas/<pk>/editar/` → editar
   - `contas/<pk>/excluir/` → excluir
-- [ ] **T7.10** Incluir `accounts.urls` em `core/urls.py`
+- [X] **T7.10** Incluir `accounts.urls` em `core/urls.py`
 
 ---
 

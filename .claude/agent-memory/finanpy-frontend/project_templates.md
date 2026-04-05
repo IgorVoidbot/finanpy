@@ -31,10 +31,15 @@ URL names referenced across templates (must exist in urls.py before templates wo
 - `landing` (root, no namespace)
 - `login`, `logout`, `signup` (root, no namespace — likely from users app)
 - `users:login`, `users:signup` (namespace: users — used in auth templates)
-- `accounts:list` (namespace: accounts)
+- `accounts:account_list`, `accounts:account_create`, `accounts:account_update`, `accounts:account_delete` (namespace: accounts)
 - `categories:list` (namespace: categories)
 - `transactions:list` (namespace: transactions)
 - `profiles:edit` (namespace: profiles)
+
+Accounts templates (T7.3, T7.5, T7.8):
+- `templates/accounts/account_list.html` — table with responsive overflow-x-auto, `get_account_type_display` for type badge, conditional emerald/rose coloring on `current_balance` via `>= 0` check, empty state with SVG bank icon
+- `templates/accounts/account_form.html` — shared create/edit form; `{% if object %}` gates the `initial_balance` field (hidden on edit); `<select>` iterates `form.account_type.field.choices` with `{% for value, label in ... %}`; selected option uses `form.account_type.value == value`
+- `templates/accounts/account_confirm_delete.html` — centered `max-w-lg mx-auto` card with rose warning icon SVG, `{{ object.name }}` in bold, standard POST form
 
 Active sidebar detection pattern:
 - Dashboard: `request.resolver_match.url_name == 'dashboard'`
