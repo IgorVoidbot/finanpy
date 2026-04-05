@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.db.models import Sum
 
 
 ACCOUNT_TYPE_CHOICES = [
@@ -33,6 +34,18 @@ class Account(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def update_account_balance(self):
+        income = self.transactions.filter(
+            transaction_type='income'
+        ).aggregate(total=Sum('amount'))['total'] or 0
+
+        expense = self.transactions.filter(
+            transaction_type='expense'
+        ).aggregate(total=Sum('amount'))['total'] or 0
+
+        self.current_balance = self.initial_balance + income - expense
+        self.save(update_fields=['current_balance', 'updated_at'])
 
     def save(self, *args, **kwargs):
         if self.pk is None:

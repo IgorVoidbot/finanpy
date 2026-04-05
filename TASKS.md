@@ -282,9 +282,9 @@
 
 ### Sprint 4 — Transações
 
-#### T11. Model de Transação
+#### [X] T11. Model de Transação
 
-- [ ] **T11.1** Criar model `Transaction` em `transactions/models.py`
+- [X] **T11.1** Criar model `Transaction` em `transactions/models.py`
   - `user = ForeignKey(User, on_delete=CASCADE, related_name='transactions')`
   - `account = ForeignKey(Account, on_delete=CASCADE, related_name='transactions')`
   - `category = ForeignKey(Category, on_delete=PROTECT, related_name='transactions')`
@@ -295,18 +295,18 @@
   - Campos `created_at` e `updated_at`
   - `class Meta: ordering = ['-date', '-created_at']`
   - `__str__` retornando `f'{description} - R$ {amount}'`
-- [ ] **T11.2** Registrar no admin com `list_display`, `list_filter`, `search_fields`
-- [ ] **T11.3** Executar `makemigrations transactions` e `migrate`
+- [X] **T11.2** Registrar no admin com `list_display`, `list_filter`, `search_fields`
+- [X] **T11.3** Executar `makemigrations transactions` e `migrate`
 
-#### T12. Lógica de Atualização de Saldo
+#### [X] T12. Lógica de Atualização de Saldo
 
-- [ ] **T12.1** Criar método `update_account_balance()` no model `Account`
+- [X] **T12.1** Criar método `update_account_balance()` no model `Account`
   - Recalcula `current_balance` = `initial_balance` + soma de entradas - soma de saídas
   - Usar `aggregate` do Django ORM
-- [ ] **T12.2** Criar `transactions/signals.py` com signals `post_save` e `post_delete`
+- [X] **T12.2** Criar `transactions/signals.py` com signals `post_save` e `post_delete`
   - Após salvar ou excluir transação, chamar `transaction.account.update_account_balance()`
-- [ ] **T12.3** Configurar `transactions/apps.py` com `ready()` importando signals
-- [ ] **T12.4** Testar: criar transações e verificar que saldo da conta atualiza corretamente
+- [X] **T12.3** Configurar `transactions/apps.py` com `ready()` importando signals
+- [X] **T12.4** Testar: criar transações e verificar que saldo da conta atualiza corretamente
 
 #### T13. CRUD de Transações (Views e Templates)
 
