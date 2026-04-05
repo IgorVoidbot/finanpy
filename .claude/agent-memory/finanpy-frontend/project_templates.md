@@ -16,10 +16,21 @@ Components (included via `{% include %}`):
 - `components/sidebar.html` — hidden on mobile; active detection via `request.resolver_match.app_name` and `url_name`; uses `{% url ... as var %}{% if var %}` pattern to avoid NoReverseMatch
 - `components/messages.html` — Django messages with JS auto-dismiss at 5000ms and manual X button; uses `data-message` attribute
 
+Profile edit template:
+- `templates/profiles/profile_edit.html` — extends `base_app.html`; two forms in one `<form method="post">`: `user_form` (first_name, last_name, email) and `profile_form` (display_name); first/last name in 2-column grid `grid grid-cols-1 sm:grid-cols-2`; each section separated by a `border-b border-gray-700` heading; submit button right-aligned above a `border-t border-gray-700` divider; all fields rendered manually for full Tailwind control
+
+Auth child templates (T4.4 and T4.6):
+- `templates/users/signup.html` — extends `base_auth.html`; fields: `form.first_name`, `form.last_name`, `form.email`, `form.password1`, `form.password2`; links to `users:login`
+- `templates/users/login.html` — extends `base_auth.html`; fields: `form.username` (email), `form.password`; links to `users:signup`
+- Both render non-field errors above the form with rose styling; per-field errors below each input in rose; no JS required
+- Input fields rendered manually (not `{{ form.as_p }}`) for full Tailwind styling control using `form.field.html_name`, `form.field.id_for_label`, `form.field.value`
+- First/last name fields use a 2-column grid: `grid grid-cols-1 gap-4 sm:grid-cols-2`
+
 URL names referenced across templates (must exist in urls.py before templates work):
 - `dashboard` (root, no namespace)
 - `landing` (root, no namespace)
 - `login`, `logout`, `signup` (root, no namespace — likely from users app)
+- `users:login`, `users:signup` (namespace: users — used in auth templates)
 - `accounts:list` (namespace: accounts)
 - `categories:list` (namespace: categories)
 - `transactions:list` (namespace: transactions)

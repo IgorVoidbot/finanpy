@@ -4,7 +4,7 @@
 
 ---
 
-### Sprint 1 — Setup e Autenticação
+### [X] Sprint 1 — Setup e Autenticação
 
 #### [X] T1. Setup inicial do projeto
 
@@ -87,70 +87,70 @@
 - [X] **T3.8** Configurar URL da landing page em `core/urls.py`
   - Rota `''` apontando para view da landing page
 
-#### T4. Autenticação (Cadastro, Login, Logout)
+#### [X] T4. Autenticação (Cadastro, Login, Logout)
 
-- [ ] **T4.1** Criar `users/forms.py` com formulário `UserRegistrationForm`
+- [X] **T4.1** Criar `users/forms.py` com formulário `UserRegistrationForm`
   - Campos: first_name, last_name, email, password1, password2
   - Herdar de `UserCreationForm` com `Meta.model = User`
   - Labels e help_texts em português
-- [ ] **T4.2** Criar `users/forms.py` com formulário `EmailAuthenticationForm`
+- [X] **T4.2** Criar `users/forms.py` com formulário `EmailAuthenticationForm`
   - Herdar de `AuthenticationForm`
   - Substituir campo `username` por campo `email` (EmailField)
   - Label em português
-- [ ] **T4.3** Criar view `SignUpView` em `users/views.py`
+- [X] **T4.3** Criar view `SignUpView` em `users/views.py`
   - Usar `CreateView` com `UserRegistrationForm`
   - Após sucesso: logar o usuário com `login()` e redirecionar ao dashboard
   - Template: `templates/users/signup.html`
-- [ ] **T4.4** Criar template `templates/users/signup.html`
+- [X] **T4.4** Criar template `templates/users/signup.html`
   - Extender `base_auth.html`
   - Formulário estilizado conforme Design System (inputs, botão primário)
   - Link "Já tem conta? Faça login"
-- [ ] **T4.5** Criar view de Login usando `LoginView` nativa do Django
+- [X] **T4.5** Criar view de Login usando `LoginView` nativa do Django
   - Configurar `authentication_form = EmailAuthenticationForm`
   - Template: `templates/users/login.html`
   - `LOGIN_REDIRECT_URL = '/dashboard/'` no settings
-- [ ] **T4.6** Criar template `templates/users/login.html`
+- [X] **T4.6** Criar template `templates/users/login.html`
   - Extender `base_auth.html`
   - Formulário estilizado (campo e-mail, campo senha, botão primário)
   - Link "Não tem conta? Cadastre-se"
-- [ ] **T4.7** Configurar `LogoutView` nativa do Django
+- [X] **T4.7** Configurar `LogoutView` nativa do Django
   - `LOGOUT_REDIRECT_URL = '/'` no settings
-- [ ] **T4.8** Configurar todas as URLs de auth em `users/urls.py`
+- [X] **T4.8** Configurar todas as URLs de auth em `users/urls.py`
   - `signup/`, `login/`, `logout/`
-- [ ] **T4.9** Incluir `users.urls` no `core/urls.py`
-- [ ] **T4.10** Configurar `LOGIN_URL = '/login/'` no settings
+- [X] **T4.9** Incluir `users.urls` no `core/urls.py`
+- [X] **T4.10** Configurar `LOGIN_URL = '/login/'` no settings
   - Garantir que `@login_required` e `LoginRequiredMixin` redirecionem corretamente
 
 ---
 
 ### Sprint 2 — Perfil e Contas Bancárias
 
-#### T5. Model e CRUD de Perfil
+#### [X] T5. Model e CRUD de Perfil
 
-- [ ] **T5.1** Criar model `Profile` em `profiles/models.py`
+- [X] **T5.1** Criar model `Profile` em `profiles/models.py`
   - `user = OneToOneField(User, on_delete=CASCADE, related_name='profile')`
   - `display_name = CharField(max_length=100, blank=True)`
   - Campos `created_at` e `updated_at`
   - `__str__` retornando `display_name` ou `user.email`
-- [ ] **T5.2** Criar signal `post_save` em `profiles/signals.py`
+- [X] **T5.2** Criar signal `post_save` em `profiles/signals.py`
   - Ao criar User, criar Profile automaticamente
   - `display_name` default = `user.first_name`
-- [ ] **T5.3** Criar `profiles/apps.py` com método `ready()` importando signals
-- [ ] **T5.4** Registrar Profile no admin em `profiles/admin.py`
-- [ ] **T5.5** Executar `makemigrations profiles` e `migrate`
-- [ ] **T5.6** Criar `profiles/forms.py` com `ProfileForm` (ModelForm)
+- [X] **T5.3** Criar `profiles/apps.py` com método `ready()` importando signals
+- [X] **T5.4** Registrar Profile no admin em `profiles/admin.py`
+- [X] **T5.5** Executar `makemigrations profiles` e `migrate`
+- [X] **T5.6** Criar `profiles/forms.py` com `ProfileForm` (ModelForm)
   - Campos editáveis: `display_name` do Profile + `first_name`, `last_name`, `email` do User
   - Criar dois forms: `UserUpdateForm` e `ProfileUpdateForm`
-- [ ] **T5.7** Criar view `ProfileUpdateView` em `profiles/views.py`
+- [X] **T5.7** Criar view `ProfileUpdateView` em `profiles/views.py`
   - Usar `LoginRequiredMixin`
   - Renderizar ambos os formulários no mesmo template
   - Salvar ambos no `form_valid`
   - Template: `templates/profiles/profile_edit.html`
-- [ ] **T5.8** Criar template `templates/profiles/profile_edit.html`
+- [X] **T5.8** Criar template `templates/profiles/profile_edit.html`
   - Extender `base_app.html`
   - Formulário estilizado conforme Design System
   - Título "Meu Perfil"
-- [ ] **T5.9** Configurar URLs em `profiles/urls.py` e incluir em `core/urls.py`
+- [X] **T5.9** Configurar URLs em `profiles/urls.py` e incluir em `core/urls.py`
   - Rota: `perfil/`
 
 #### T6. Model de Conta Bancária
