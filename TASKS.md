@@ -6,7 +6,7 @@
 
 ### Sprint 1 — Setup e Autenticação
 
-#### T1. Setup inicial do projeto
+#### [X] T1. Setup inicial do projeto
 
 - [X] **T1.1** Criar ambiente virtual Python e ativar
   - Executar `python -m venv venv` e ativar com `source venv/bin/activate`
@@ -18,19 +18,19 @@
   - `python manage.py startapp <nome>` para cada app
 - [X] **T1.5** Registrar todas as apps no `INSTALLED_APPS` em `core/settings.py`
   - Adicionar cada app na lista como string (ex: `'users.apps.UsersConfig'`)
-- [ ] **T1.6** Configurar `LANGUAGE_CODE = 'pt-br'` e `TIME_ZONE = 'America/Sao_Paulo'` em settings
+- [X] **T1.6** Configurar `LANGUAGE_CODE = 'pt-br'` e `TIME_ZONE = 'America/Sao_Paulo'` em settings
   - Editar `core/settings.py`
-- [ ] **T1.7** Configurar `AUTH_USER_MODEL = 'users.User'` em settings
+- [X] **T1.7** Configurar `AUTH_USER_MODEL = 'users.User'` em settings
   - Adicionar a variável antes de rodar qualquer migration
-- [ ] **T1.8** Configurar TailwindCSS via CDN no template base
+- [X] **T1.8** Configurar TailwindCSS via CDN no template base
   - Adicionar `<script src="https://cdn.tailwindcss.com">` no `<head>` do `base.html`
   - Adicionar link para fonte Inter do Google Fonts
-- [ ] **T1.9** Criar a estrutura de diretórios `templates/` e `static/` na raiz do projeto
+- [X] **T1.9** Criar a estrutura de diretórios `templates/` e `static/` na raiz do projeto
   - Configurar `TEMPLATES[0]['DIRS']` e `STATICFILES_DIRS` no settings
 - [X] **T1.10** Criar `.gitignore` com: `venv/`, `db.sqlite3`, `__pycache__/`, `*.pyc`, `.env`
-- [ ] **T1.11** Executar `python manage.py migrate` para criar o banco inicial
+- [X] **T1.11** Executar `python manage.py migrate` para criar o banco inicial
   - Verificar que db.sqlite3 foi criado
-- [ ] **T1.12** Criar superusuário de desenvolvimento
+- [X] **T1.12** Criar superusuário de desenvolvimento
   - `python manage.py createsuperuser`
 
 #### T2. Model de Usuário Customizado
