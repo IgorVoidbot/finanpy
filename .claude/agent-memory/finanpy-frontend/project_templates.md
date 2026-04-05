@@ -51,6 +51,10 @@ Transactions templates (T13.4, T13.6, T13.9):
 - `templates/transactions/transaction_form.html` — amount+date in `sm:grid-cols-2` grid; account+category in second `sm:grid-cols-2` grid; ModelChoiceField selects (account, category) use `|stringformat:'s'` on both sides of selected comparison since value is an int PK; transaction_type skips empty choice with `{% if value %}`
 - `templates/transactions/transaction_confirm_delete.html` — same centered max-w-lg card pattern as category/account confirm_delete; secondary warning note mentions account balance recalculation
 
+Dashboard template (T_dashboard):
+- `templates/dashboard.html` — extends `base_app.html`; block: `{% block page_content %}`; 4-card summary grid (`grid-cols-1 sm:grid-cols-2 lg:grid-cols-4`); monthly_balance color toggled via `{% if monthly_balance >= 0 %}`; recent_transactions mini-table (3 cols: date `d/m`, description+category badge, amount); expenses_by_category progress bars use `{% widthratio item.total monthly_expense 100 %}%` guarded by `{% if monthly_expense > 0 %}`; "Ver todas" links to `transactions:transaction_list`; uses `{% now "F Y" %}` for subtitle (no load needed — built-in tag)
+- Sidebar note: sidebar.html references `transactions:list` (line 63) but actual URL is `transactions:transaction_list` — dashboard correctly uses `transactions:transaction_list`
+
 Active sidebar detection pattern:
 - Dashboard: `request.resolver_match.url_name == 'dashboard'`
 - Other apps: `request.resolver_match.app_name == '<app_name>'`

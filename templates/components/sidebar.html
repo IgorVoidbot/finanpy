@@ -22,7 +22,7 @@
         {% endif %}
 
         <!-- Contas -->
-        {% url 'accounts:list' as url_accounts %}
+        {% url 'accounts:account_list' as url_accounts %}
         {% if url_accounts %}
         <a
             href="{{ url_accounts }}"
@@ -41,7 +41,7 @@
         {% endif %}
 
         <!-- Categorias -->
-        {% url 'categories:list' as url_categories %}
+        {% url 'categories:category_list' as url_categories %}
         {% if url_categories %}
         <a
             href="{{ url_categories }}"
@@ -60,7 +60,7 @@
         {% endif %}
 
         <!-- Transações -->
-        {% url 'transactions:list' as url_transactions %}
+        {% url 'transactions:transaction_list' as url_transactions %}
         {% if url_transactions %}
         <a
             href="{{ url_transactions }}"
@@ -79,7 +79,7 @@
         {% endif %}
 
         <!-- Perfil -->
-        {% url 'profiles:edit' as url_profile %}
+        {% url 'profiles:profile_edit' as url_profile %}
         {% if url_profile %}
         <a
             href="{{ url_profile }}"

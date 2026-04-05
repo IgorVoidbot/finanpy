@@ -17,10 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
-from core.views import LandingView
+from core.views import DashboardView, LandingView
 
 urlpatterns = [
     path('', LandingView.as_view(), name='landing'),
+    path('dashboard/', DashboardView.as_view(), name='dashboard'),
     path('admin/', admin.site.urls),
     path('', include('users.urls', namespace='users')),
     path('', include('profiles.urls', namespace='profiles')),

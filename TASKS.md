@@ -355,11 +355,11 @@
 
 ---
 
-### Sprint 5 — Dashboard
+### [X] Sprint 5 — Dashboard
 
-#### T14. View e Template do Dashboard
+#### [X] T14. View e Template do Dashboard
 
-- [ ] **T14.1** Criar view `DashboardView` (pode ficar em `core/views.py` ou app separada)
+- [X] **T14.1** Criar view `DashboardView` (pode ficar em `core/views.py` ou app separada)
   - `LoginRequiredMixin` + `TemplateView`
   - No `get_context_data`, calcular:
     - `total_balance`: soma de `current_balance` de todas as contas do user
@@ -368,7 +368,7 @@
     - `monthly_balance`: income - expense
     - `recent_transactions`: últimas 5 transações do user
     - `expenses_by_category`: transações de saída do mês agrupadas por categoria com soma
-- [ ] **T14.2** Criar template `templates/dashboard.html`
+- [X] **T14.2** Criar template `templates/dashboard.html`
   - Extender `base_app.html`
   - Grid com 4 cards de resumo:
     - Saldo Total (com ícone, valor grande, gradient top border emerald)
@@ -377,10 +377,10 @@
     - Balanço do Mês (verde se positivo, vermelho se negativo)
   - Seção "Últimas Transações": mini-tabela com 5 últimas
   - Seção "Gastos por Categoria": lista de categorias com barra de progresso ou valor
-- [ ] **T14.3** Configurar URL do dashboard em `core/urls.py`
+- [X] **T14.3** Configurar URL do dashboard em `core/urls.py`
   - Rota: `dashboard/`
-- [ ] **T14.4** Verificar que `LOGIN_REDIRECT_URL = '/dashboard/'` está no settings
-- [ ] **T14.5** Garantir que o link "Dashboard" na sidebar esteja ativo quando na rota correta
+- [X] **T14.4** Verificar que `LOGIN_REDIRECT_URL = '/dashboard/'` está no settings
+- [X] **T14.5** Garantir que o link "Dashboard" na sidebar esteja ativo quando na rota correta
 
 ---
 
