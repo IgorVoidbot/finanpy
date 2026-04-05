@@ -234,15 +234,15 @@
 - [X] **T8.2** Registrar no admin
 - [X] **T8.3** Executar `makemigrations categories` e `migrate`
 
-#### T9. Categorias Padrão via Signal
+#### [X] T9. Categorias Padrão via Signal
 
-- [ ] **T9.1** Criar `categories/signals.py`
+- [X] **T9.1** Criar `categories/signals.py`
   - Signal `post_save` no model `User`
   - Ao criar novo usuário (`created=True`), criar categorias padrão:
     - Entrada: Salário, Freelance, Investimentos, Outros
     - Saída: Alimentação, Transporte, Moradia, Lazer, Saúde, Educação, Outros
-- [ ] **T9.2** Configurar `categories/apps.py` com `ready()` importando signals
-- [ ] **T9.3** Testar: criar novo usuário e verificar se categorias foram criadas
+- [X] **T9.2** Configurar `categories/apps.py` com `ready()` importando signals
+- [X] **T9.3** Testar: criar novo usuário e verificar se categorias foram criadas
 
 #### T10. CRUD de Categorias (Views e Templates)
 
