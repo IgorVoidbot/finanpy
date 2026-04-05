@@ -221,9 +221,9 @@
 
 ### Sprint 3 — Categorias e Categorias Padrão
 
-#### T8. Model de Categoria
+#### [X] T8. Model de Categoria
 
-- [ ] **T8.1** Criar model `Category` em `categories/models.py`
+- [X] **T8.1** Criar model `Category` em `categories/models.py`
   - `user = ForeignKey(User, on_delete=CASCADE, related_name='categories')`
   - `name = CharField(max_length=50)`
   - `transaction_type = CharField(choices=TRANSACTION_TYPE_CHOICES)`
@@ -231,8 +231,8 @@
   - Campos `created_at` e `updated_at`
   - `class Meta: ordering = ['name']` e `unique_together = ['user', 'name', 'transaction_type']`
   - `__str__` retornando nome
-- [ ] **T8.2** Registrar no admin
-- [ ] **T8.3** Executar `makemigrations categories` e `migrate`
+- [X] **T8.2** Registrar no admin
+- [X] **T8.3** Executar `makemigrations categories` e `migrate`
 
 #### T9. Categorias Padrão via Signal
 
