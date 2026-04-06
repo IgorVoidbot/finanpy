@@ -15,6 +15,7 @@ Components (included via `{% include %}`):
 - `components/navbar.html` — sticky top bar, hamburger button id="menu-toggle", uses `{% url 'dashboard' %}` and `{% url 'logout' %}`
 - `components/sidebar.html` — hidden on mobile; active detection via `request.resolver_match.app_name` and `url_name`; uses `{% url ... as var %}{% if var %}` pattern to avoid NoReverseMatch
 - `components/messages.html` — Django messages with JS auto-dismiss at 5000ms and manual X button; uses `data-message` attribute
+- `components/modal_confirm.html` (T16.1) — reusable delete confirmation modal; included once per list page before `{% endblock %}`; trigger any element with `data-delete-url`, `data-modal-title`, `data-modal-body`, `data-modal-warning` attributes; JS is a vanilla IIFE using event delegation; `z-[80]` (above mobile sidebar `z-[70]`); locks body scroll on open; closes on backdrop click or Escape key
 
 Profile edit template:
 - `templates/profiles/profile_edit.html` — extends `base_app.html`; two forms in one `<form method="post">`: `user_form` (first_name, last_name, email) and `profile_form` (display_name); first/last name in 2-column grid `grid grid-cols-1 sm:grid-cols-2`; each section separated by a `border-b border-gray-700` heading; submit button right-aligned above a `border-t border-gray-700` divider; all fields rendered manually for full Tailwind control

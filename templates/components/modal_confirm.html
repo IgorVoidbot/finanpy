@@ -1,0 +1,102 @@
+<!-- Modal de confirmação de exclusão (T16.1) -->
+<!-- Uso: inclua uma vez na página; use data-delete-url e data-delete-name nos botões de exclusão -->
+<div
+    id="modal-confirm"
+    class="hidden fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/60"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-confirm-title"
+>
+    <div
+        id="modal-confirm-panel"
+        class="bg-gray-900 border border-gray-700 rounded-xl p-8 w-full max-w-md shadow-xl"
+    >
+        <!-- Ícone de aviso -->
+        <div class="flex justify-center mb-5">
+            <div class="w-16 h-16 rounded-full bg-rose-500/10 flex items-center justify-center">
+                <svg class="w-8 h-8 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+        </div>
+
+        <!-- Título (preenchido via JS) -->
+        <h2 id="modal-confirm-title" class="text-xl font-semibold text-rose-400 text-center mb-3"></h2>
+
+        <!-- Mensagem (preenchida via JS) -->
+        <p id="modal-confirm-body" class="text-sm text-gray-300 text-center mb-2"></p>
+
+        <!-- Aviso secundário -->
+        <p id="modal-confirm-warning" class="text-sm text-gray-500 text-center mb-8"></p>
+
+        <!-- Formulário de exclusão (action preenchida via JS) -->
+        <form id="modal-confirm-form" method="post">
+            {% csrf_token %}
+            <div class="flex items-center justify-end gap-3">
+                <button
+                    type="button"
+                    id="modal-confirm-cancel"
+                    class="bg-gray-700 hover:bg-gray-600 text-gray-100 font-medium py-2.5 px-6 rounded-lg transition-colors duration-200"
+                >
+                    Cancelar
+                </button>
+                <button
+                    type="submit"
+                    class="bg-rose-500 hover:bg-rose-600 text-white font-medium py-2.5 px-6 rounded-lg transition-colors duration-200"
+                >
+                    Excluir
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+(function () {
+    var modal   = document.getElementById('modal-confirm');
+    var panel   = document.getElementById('modal-confirm-panel');
+    var form    = document.getElementById('modal-confirm-form');
+    var title   = document.getElementById('modal-confirm-title');
+    var body    = document.getElementById('modal-confirm-body');
+    var warning = document.getElementById('modal-confirm-warning');
+    var cancelBtn = document.getElementById('modal-confirm-cancel');
+
+    function openModal(triggerEl) {
+        form.action    = triggerEl.dataset.deleteUrl;
+        title.textContent   = triggerEl.dataset.modalTitle   || 'Confirmar exclusão';
+        body.textContent    = triggerEl.dataset.modalBody    || 'Tem certeza que deseja excluir este item?';
+        warning.textContent = triggerEl.dataset.modalWarning || 'Esta ação não pode ser desfeita.';
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+
+    // Delegação de eventos: captura cliques em qualquer botão com data-delete-url na página
+    document.addEventListener('click', function (e) {
+        var trigger = e.target.closest('[data-delete-url]');
+        if (trigger) {
+            e.preventDefault();
+            openModal(trigger);
+        }
+    });
+
+    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+    // Fecha ao clicar no backdrop (fora do painel)
+    if (modal) {
+        modal.addEventListener('click', function (e) {
+            if (!panel.contains(e.target)) closeModal();
+        });
+    }
+
+    // Fecha com Escape
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
+    });
+}());
+</script>

@@ -51,12 +51,16 @@
                                 >
                                     Editar
                                 </a>
-                                <a
-                                    href="{% url 'accounts:account_delete' pk=account.pk %}"
+                                <button
+                                    type="button"
+                                    data-delete-url="{% url 'accounts:account_delete' pk=account.pk %}"
+                                    data-modal-title="Excluir Conta"
+                                    data-modal-body="Tem certeza que deseja excluir a conta {{ account.name }}?"
+                                    data-modal-warning="Esta ação não pode ser desfeita. Todas as transações vinculadas também serão excluídas."
                                     class="text-rose-400 hover:text-rose-300 text-sm font-medium transition-colors duration-200"
                                 >
                                     Excluir
-                                </a>
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -84,4 +88,5 @@
         </table>
     </div>
 </div>
+{% include 'components/modal_confirm.html' %}
 {% endblock %}

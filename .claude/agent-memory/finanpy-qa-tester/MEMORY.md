@@ -1,2 +1,4 @@
 - [Test Data and Credentials](project_test_data.md) — working test credentials and users created during QA sessions
 - [Admin Behavior Notes](project_admin_behavior.md) — Django admin quirks including login redirect and add_fieldsets behavior
+- [URL Namespace Bug Pattern](project_url_namespace_bugs.md) — templates must use `users:login` etc.; bare names cause 500 on all authenticated pages
+- [Mobile Sidebar Z-Index Fix](project_mobile_sidebar_zindex.md) — drawer panel needs z-[70], overlay z-[60] to stack above sticky navbar at z-50

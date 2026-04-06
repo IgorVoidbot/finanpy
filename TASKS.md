@@ -386,23 +386,23 @@
 
 ### Sprint 6 — Refinamentos e Responsividade
 
-#### T15. Menu Mobile
+#### [X] T15. Menu Mobile
 
-- [ ] **T15.1** Implementar toggle de sidebar mobile com JavaScript vanilla
+- [X] **T15.1** Implementar toggle de sidebar mobile com JavaScript vanilla
   - Botão hamburger na navbar (visível apenas em mobile)
   - Sidebar abre como overlay com fundo escuro (`bg-black/60`)
   - Botão de fechar (X) dentro da sidebar mobile
-- [ ] **T15.2** Garantir que ao clicar em um link da sidebar mobile, ela fecha
-- [ ] **T15.3** Testar responsividade em todas as telas (320px a 1440px)
+- [X] **T15.2** Garantir que ao clicar em um link da sidebar mobile, ela fecha
+- [X] **T15.3** Testar responsividade em todas as telas (320px a 1440px)
 
-#### T16. Modal de Confirmação de Exclusão (JavaScript)
+#### [X] T16. Modal de Confirmação de Exclusão (JavaScript)
 
-- [ ] **T16.1** Criar componente `templates/components/modal_confirm.html`
+- [X] **T16.1** Criar componente `templates/components/modal_confirm.html`
   - Modal genérico reutilizável via `{% include %}` com variáveis de contexto
   - JavaScript vanilla para abrir/fechar modal
-- [ ] **T16.2** Integrar modal nas views de exclusão (contas, categorias, transações)
+- [X] **T16.2** Integrar modal nas views de exclusão (contas, categorias, transações)
   - Substituir página de confirmação por modal inline na lista
-- [ ] **T16.3** Testar fluxo de exclusão com modal em todas as entidades
+- [X] **T16.3** Testar fluxo de exclusão com modal em todas as entidades
 
 #### T17. Refinamentos Visuais
 

@@ -18,13 +18,13 @@
             </span>
             <div class="flex items-center gap-3">
                 <a
-                    href="{% url 'login' %}"
+                    href="{% url 'users:login' %}"
                     class="text-sm text-gray-400 hover:text-gray-100 transition-colors duration-200"
                 >
                     Entrar
                 </a>
                 <a
-                    href="{% url 'signup' %}"
+                    href="{% url 'users:signup' %}"
                     class="bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors duration-200"
                 >
                     Cadastrar-se
@@ -47,13 +47,13 @@
             </p>
             <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <a
-                    href="{% url 'signup' %}"
+                    href="{% url 'users:signup' %}"
                     class="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-3 px-8 rounded-lg transition-colors duration-200 text-base"
                 >
                     Cadastre-se grátis
                 </a>
                 <a
-                    href="{% url 'login' %}"
+                    href="{% url 'users:login' %}"
                     class="w-full sm:w-auto border border-gray-600 hover:border-emerald-500 text-gray-300 hover:text-emerald-400 font-medium py-3 px-8 rounded-lg transition-colors duration-200 text-base"
                 >
                     Fazer login

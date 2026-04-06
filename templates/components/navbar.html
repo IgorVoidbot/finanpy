@@ -29,7 +29,7 @@
                 Olá, {{ user.first_name|default:user.email }}
             </span>
             <a
-                href="{% url 'logout' %}"
+                href="{% url 'users:logout' %}"
                 class="text-sm text-gray-400 hover:text-rose-400 transition-colors duration-200"
             >
                 Sair

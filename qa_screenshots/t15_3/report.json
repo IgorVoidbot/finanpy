@@ -1,0 +1,354 @@
+{
+  "passed": 58,
+  "failed": 0,
+  "results": [
+    {
+      "status": true,
+      "name": "mobile_320 — hamburger button visible",
+      "details": "Expected: visible | computed visible: True",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_320 — desktop sidebar hidden (outer wrapper)",
+      "details": "Expected: hidden | computed visible: False",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_320 — overlay has \"hidden\" class before click",
+      "details": "Classes: hidden fixed inset-0 z-[60] bg-black/60",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_320 — overlay opens after hamburger click",
+      "details": "Classes after click: fixed inset-0 z-[60] bg-black/60",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_320 — drawer panel visible when overlay open",
+      "details": "Panel computed visible: True",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_320 — drawer has nav links (found 5)",
+      "details": "Expected: >= 5 | Found: 5",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_320 — close button hides overlay",
+      "details": "Classes after close: fixed inset-0 z-[60] bg-black/60 hidden",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_320 — backdrop click closes overlay",
+      "details": "Classes after backdrop click: fixed inset-0 z-[60] bg-black/60 hidden",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_375 — hamburger button visible",
+      "details": "Expected: visible | computed visible: True",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_375 — desktop sidebar hidden (outer wrapper)",
+      "details": "Expected: hidden | computed visible: False",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_375 — overlay has \"hidden\" class before click",
+      "details": "Classes: hidden fixed inset-0 z-[60] bg-black/60",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_375 — overlay opens after hamburger click",
+      "details": "Classes after click: fixed inset-0 z-[60] bg-black/60",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_375 — drawer panel visible when overlay open",
+      "details": "Panel computed visible: True",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_375 — drawer has nav links (found 5)",
+      "details": "Expected: >= 5 | Found: 5",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_375 — close button hides overlay",
+      "details": "Classes after close: fixed inset-0 z-[60] bg-black/60 hidden",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_375 — backdrop click closes overlay",
+      "details": "Classes after backdrop click: fixed inset-0 z-[60] bg-black/60 hidden",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_414 — hamburger button visible",
+      "details": "Expected: visible | computed visible: True",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_414 — desktop sidebar hidden (outer wrapper)",
+      "details": "Expected: hidden | computed visible: False",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_414 — overlay has \"hidden\" class before click",
+      "details": "Classes: hidden fixed inset-0 z-[60] bg-black/60",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_414 — overlay opens after hamburger click",
+      "details": "Classes after click: fixed inset-0 z-[60] bg-black/60",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_414 — drawer panel visible when overlay open",
+      "details": "Panel computed visible: True",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_414 — drawer has nav links (found 5)",
+      "details": "Expected: >= 5 | Found: 5",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_414 — close button hides overlay",
+      "details": "Classes after close: fixed inset-0 z-[60] bg-black/60 hidden",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_414 — backdrop click closes overlay",
+      "details": "Classes after backdrop click: fixed inset-0 z-[60] bg-black/60 hidden",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "tablet_768 — hamburger hidden",
+      "details": "Expected: hidden | computed visible: False",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "tablet_768 — desktop sidebar visible",
+      "details": "Expected: visible | computed visible: True",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "tablet_768 — aside has nav links (found 5)",
+      "details": "Expected: >= 5 | Found: 5",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "desktop_1024 — hamburger hidden",
+      "details": "Expected: hidden | computed visible: False",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "desktop_1024 — desktop sidebar visible",
+      "details": "Expected: visible | computed visible: True",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "desktop_1024 — aside has nav links (found 5)",
+      "details": "Expected: >= 5 | Found: 5",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "desktop_1440 — hamburger hidden",
+      "details": "Expected: hidden | computed visible: False",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "desktop_1440 — desktop sidebar visible",
+      "details": "Expected: visible | computed visible: True",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "desktop_1440 — aside has nav links (found 5)",
+      "details": "Expected: >= 5 | Found: 5",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_375 — dashboard: no horizontal overflow",
+      "details": "scrollWidth=375 clientWidth=375",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_375 — contas: no horizontal overflow",
+      "details": "scrollWidth=375 clientWidth=375",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_375 — categorias: no horizontal overflow",
+      "details": "scrollWidth=375 clientWidth=375",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_375 — transacoes: no horizontal overflow",
+      "details": "scrollWidth=375 clientWidth=375",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_375 — perfil: no horizontal overflow",
+      "details": "scrollWidth=375 clientWidth=375",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "tablet_768 — dashboard: no horizontal overflow",
+      "details": "scrollWidth=768 clientWidth=768",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "tablet_768 — contas: no horizontal overflow",
+      "details": "scrollWidth=768 clientWidth=768",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "tablet_768 — categorias: no horizontal overflow",
+      "details": "scrollWidth=768 clientWidth=768",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "tablet_768 — transacoes: no horizontal overflow",
+      "details": "scrollWidth=768 clientWidth=768",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "tablet_768 — perfil: no horizontal overflow",
+      "details": "scrollWidth=768 clientWidth=768",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "desktop_1440 — dashboard: no horizontal overflow",
+      "details": "scrollWidth=1440 clientWidth=1440",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "desktop_1440 — contas: no horizontal overflow",
+      "details": "scrollWidth=1440 clientWidth=1440",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "desktop_1440 — categorias: no horizontal overflow",
+      "details": "scrollWidth=1440 clientWidth=1440",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "desktop_1440 — transacoes: no horizontal overflow",
+      "details": "scrollWidth=1440 clientWidth=1440",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "desktop_1440 — perfil: no horizontal overflow",
+      "details": "scrollWidth=1440 clientWidth=1440",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "dashboard loads HTTP 200",
+      "details": "URL: http://127.0.0.1:8000/dashboard/",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "contas loads HTTP 200",
+      "details": "URL: http://127.0.0.1:8000/contas/",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "categorias loads HTTP 200",
+      "details": "URL: http://127.0.0.1:8000/categorias/",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "transacoes loads HTTP 200",
+      "details": "URL: http://127.0.0.1:8000/transacoes/",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "perfil loads HTTP 200",
+      "details": "URL: http://127.0.0.1:8000/perfil/",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_375 — dashboard: no JS console errors",
+      "details": "",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_375 — contas: no JS console errors",
+      "details": "",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_375 — categorias: no JS console errors",
+      "details": "",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_375 — transacoes: no JS console errors",
+      "details": "",
+      "extra": ""
+    },
+    {
+      "status": true,
+      "name": "mobile_375 — perfil: no JS console errors",
+      "details": "",
+      "extra": ""
+    }
+  ]
+}

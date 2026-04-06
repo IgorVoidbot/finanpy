@@ -49,12 +49,16 @@
                                 >
                                     Editar
                                 </a>
-                                <a
-                                    href="{% url 'categories:category_delete' pk=category.pk %}"
+                                <button
+                                    type="button"
+                                    data-delete-url="{% url 'categories:category_delete' pk=category.pk %}"
+                                    data-modal-title="Excluir Categoria"
+                                    data-modal-body="Tem certeza que deseja excluir a categoria {{ category.name }}?"
+                                    data-modal-warning="Esta ação não pode ser desfeita. As transações vinculadas a esta categoria não serão excluídas."
                                     class="text-rose-400 hover:text-rose-300 text-sm font-medium transition-colors duration-200"
                                 >
                                     Excluir
-                                </a>
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -82,4 +86,5 @@
         </table>
     </div>
 </div>
+{% include 'components/modal_confirm.html' %}
 {% endblock %}
