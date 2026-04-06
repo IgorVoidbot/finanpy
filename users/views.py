@@ -9,7 +9,7 @@ from .forms import EmailAuthenticationForm, UserRegistrationForm
 class SignUpView(CreateView):
     form_class = UserRegistrationForm
     template_name = 'users/signup.html'
-    success_url = reverse_lazy('landing')
+    success_url = reverse_lazy('dashboard')
 
     def form_valid(self, form):
         response = super().form_valid(form)

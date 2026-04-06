@@ -30,6 +30,10 @@ type: project
 **Why:** T16.3 spec listed test@test.com but the user did not exist; must be created before Playwright tests.
 **How to apply:** Always verify `test@test.com` exists before running browser tests. If missing, create via shell. Default categories are auto-created by post_save signal.
 
+## T17 session notes (2026-04-06)
+- test@test.com had one account with balance R$ 200,00 and no transactions at time of T17 testing
+- Signup URL is /signup/ — /cadastro/ returns 404 (route not aliased in Portuguese)
+
 ## QA test data naming convention (T16.3)
 - Accounts: `Conta QA Para Excluir`, `Conta QA Permanente`
 - Categories: `Categoria QA Para Excluir`, `Categoria QA Para Excluir 2`

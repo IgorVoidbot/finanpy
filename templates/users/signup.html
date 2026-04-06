@@ -19,7 +19,7 @@
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 mb-4">
         <!-- Primeiro nome -->
         <div>
-            <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">
+            <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-400 mb-1">
                 Nome
             </label>
             <input
@@ -28,7 +28,7 @@
                 id="{{ form.first_name.id_for_label }}"
                 value="{{ form.first_name.value|default:'' }}"
                 placeholder="João"
-                class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
             >
             {% if form.first_name.errors %}
                 <div class="text-rose-400 text-sm mt-1">
@@ -41,7 +41,7 @@
 
         <!-- Sobrenome -->
         <div>
-            <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">
+            <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-400 mb-1">
                 Sobrenome
             </label>
             <input
@@ -50,7 +50,7 @@
                 id="{{ form.last_name.id_for_label }}"
                 value="{{ form.last_name.value|default:'' }}"
                 placeholder="Silva"
-                class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
             >
             {% if form.last_name.errors %}
                 <div class="text-rose-400 text-sm mt-1">
@@ -64,7 +64,7 @@
 
     <!-- E-mail -->
     <div class="mb-4">
-        <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">
+        <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-400 mb-1">
             E-mail
         </label>
         <input
@@ -73,7 +73,7 @@
             id="{{ form.email.id_for_label }}"
             value="{{ form.email.value|default:'' }}"
             placeholder="joao@exemplo.com"
-            class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+            class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
         >
         {% if form.email.errors %}
             <div class="text-rose-400 text-sm mt-1">
@@ -86,7 +86,7 @@
 
     <!-- Senha -->
     <div class="mb-4">
-        <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">
+        <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-gray-400 mb-1">
             Senha
         </label>
         <input
@@ -94,7 +94,7 @@
             name="{{ form.password1.html_name }}"
             id="{{ form.password1.id_for_label }}"
             placeholder="••••••••"
-            class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+            class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
         >
         {% if form.password1.errors %}
             <div class="text-rose-400 text-sm mt-1">
@@ -107,7 +107,7 @@
 
     <!-- Confirmar senha -->
     <div class="mb-6">
-        <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-1">
+        <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-gray-400 mb-1">
             Confirmar senha
         </label>
         <input
@@ -115,7 +115,7 @@
             name="{{ form.password2.html_name }}"
             id="{{ form.password2.id_for_label }}"
             placeholder="••••••••"
-            class="w-full bg-gray-800 border border-gray-600 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+            class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
         >
         {% if form.password2.errors %}
             <div class="text-rose-400 text-sm mt-1">
@@ -128,7 +128,7 @@
 
     <button
         type="submit"
-        class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors"
+        class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2.5 px-4 rounded-lg transition-colors duration-200"
     >
         Cadastrar
     </button>
@@ -136,7 +136,7 @@
 
 <p class="text-center text-sm text-gray-500 mt-6">
     Já tem conta?
-    <a href="{% url 'users:login' %}" class="text-emerald-400 hover:text-emerald-300 font-medium transition-colors">
+    <a href="{% url 'users:login' %}" class="text-emerald-400 hover:text-emerald-300 font-medium transition-colors duration-200">
         Faça login
     </a>
 </p>

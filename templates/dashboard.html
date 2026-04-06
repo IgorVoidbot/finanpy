@@ -1,4 +1,5 @@
 {% extends 'base_app.html' %}
+{% load format_filters %}
 
 {% block app_title %}Dashboard{% endblock %}
 
@@ -14,7 +15,7 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
 
     <!-- Saldo Total -->
-    <div class="bg-gray-900 rounded-xl p-5 border border-gray-800 border-t-2 border-t-emerald-500">
+    <div class="bg-gray-900 rounded-xl p-5 border border-gray-700 border-t-2 border-t-emerald-500">
         <div class="flex items-center justify-between mb-3">
             <span class="text-sm font-medium text-gray-400">Saldo Total</span>
             <div class="w-9 h-9 bg-emerald-500/10 rounded-lg flex items-center justify-center">
@@ -24,11 +25,11 @@
                 </svg>
             </div>
         </div>
-        <p class="text-2xl font-bold text-emerald-400">R$ {{ total_balance }}</p>
+        <p class="text-2xl font-bold text-emerald-400">{{ total_balance|currency_brl }}</p>
     </div>
 
     <!-- Entradas do Mês -->
-    <div class="bg-gray-900 rounded-xl p-5 border border-gray-800 border-t-2 border-t-emerald-500">
+    <div class="bg-gray-900 rounded-xl p-5 border border-gray-700 border-t-2 border-t-emerald-500">
         <div class="flex items-center justify-between mb-3">
             <span class="text-sm font-medium text-gray-400">Entradas do Mês</span>
             <div class="w-9 h-9 bg-emerald-500/10 rounded-lg flex items-center justify-center">
@@ -38,11 +39,11 @@
                 </svg>
             </div>
         </div>
-        <p class="text-2xl font-bold text-emerald-400">R$ {{ monthly_income }}</p>
+        <p class="text-2xl font-bold text-emerald-400">{{ monthly_income|currency_brl }}</p>
     </div>
 
     <!-- Saídas do Mês -->
-    <div class="bg-gray-900 rounded-xl p-5 border border-gray-800 border-t-2 border-t-rose-500">
+    <div class="bg-gray-900 rounded-xl p-5 border border-gray-700 border-t-2 border-t-rose-500">
         <div class="flex items-center justify-between mb-3">
             <span class="text-sm font-medium text-gray-400">Saídas do Mês</span>
             <div class="w-9 h-9 bg-rose-500/10 rounded-lg flex items-center justify-center">
@@ -52,11 +53,11 @@
                 </svg>
             </div>
         </div>
-        <p class="text-2xl font-bold text-rose-400">R$ {{ monthly_expense }}</p>
+        <p class="text-2xl font-bold text-rose-400">{{ monthly_expense|currency_brl }}</p>
     </div>
 
     <!-- Balanço do Mês -->
-    <div class="bg-gray-900 rounded-xl p-5 border border-gray-800 border-t-2 border-t-violet-500">
+    <div class="bg-gray-900 rounded-xl p-5 border border-gray-700 border-t-2 border-t-violet-500">
         <div class="flex items-center justify-between mb-3">
             <span class="text-sm font-medium text-gray-400">Balanço do Mês</span>
             <div class="w-9 h-9 bg-violet-500/10 rounded-lg flex items-center justify-center">
@@ -67,7 +68,7 @@
             </div>
         </div>
         <p class="text-2xl font-bold {% if monthly_balance >= 0 %}text-emerald-400{% else %}text-rose-400{% endif %}">
-            R$ {{ monthly_balance }}
+            {{ monthly_balance|currency_brl }}
         </p>
     </div>
 
@@ -77,7 +78,7 @@
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
     <!-- Coluna esquerda: Últimas Transações -->
-    <div class="bg-gray-900 rounded-xl p-5 border border-gray-800">
+    <div class="bg-gray-900 rounded-xl p-5 border border-gray-700">
 
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-gray-100">Últimas Transações</h2>
@@ -121,7 +122,7 @@
                                 <!-- Valor -->
                                 <td class="px-3 py-3 text-right font-medium whitespace-nowrap
                                     {% if t.transaction_type == 'income' %}text-emerald-400{% else %}text-rose-400{% endif %}">
-                                    R$ {{ t.amount }}
+                                    {{ t.amount|currency_brl }}
                                 </td>
 
                             </tr>
@@ -142,7 +143,7 @@
     </div>
 
     <!-- Coluna direita: Gastos por Categoria -->
-    <div class="bg-gray-900 rounded-xl p-5 border border-gray-800">
+    <div class="bg-gray-900 rounded-xl p-5 border border-gray-700">
 
         <div class="flex items-center justify-between mb-1">
             <h2 class="text-lg font-semibold text-gray-100">Gastos por Categoria</h2>
@@ -155,7 +156,7 @@
                     <li>
                         <div class="flex items-center justify-between mb-1.5">
                             <span class="text-sm text-gray-300">{{ item.category__name }}</span>
-                            <span class="text-sm font-medium text-rose-400">R$ {{ item.total }}</span>
+                            <span class="text-sm font-medium text-rose-400">{{ item.total|currency_brl }}</span>
                         </div>
                         <div class="bg-gray-800 rounded-full h-1.5">
                             <div

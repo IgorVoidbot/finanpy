@@ -1,4 +1,5 @@
 {% extends 'base_app.html' %}
+{% load format_filters %}
 
 {% block app_title %}Minhas Transações{% endblock %}
 
@@ -162,7 +163,7 @@
                         <!-- Valor -->
                         <td class="px-4 py-3 text-right font-medium whitespace-nowrap
                             {% if transaction.transaction_type == 'income' %}text-emerald-400{% else %}text-rose-400{% endif %}">
-                            R$ {{ transaction.amount }}
+                            {{ transaction.amount|currency_brl }}
                         </td>
 
                         <!-- Ações -->

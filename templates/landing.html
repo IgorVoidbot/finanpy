@@ -4,10 +4,6 @@
 
 {% block content %}
 
-{% if user.is_authenticated %}
-<script>window.location.href = '{% url "dashboard" %}';</script>
-{% endif %}
-
 <div class="min-h-screen bg-gray-950 text-gray-100 flex flex-col">
 
     <!-- Navbar pública -->

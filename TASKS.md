@@ -384,7 +384,7 @@
 
 ---
 
-### Sprint 6 — Refinamentos e Responsividade
+### [X] Sprint 6 — Refinamentos e Responsividade
 
 #### [X] T15. Menu Mobile
 
@@ -404,19 +404,19 @@
   - Substituir página de confirmação por modal inline na lista
 - [X] **T16.3** Testar fluxo de exclusão com modal em todas as entidades
 
-#### T17. Refinamentos Visuais
+#### [X] T17. Refinamentos Visuais
 
-- [ ] **T17.1** Adicionar ícones SVG inline na sidebar (Dashboard, Contas, Categorias, etc.)
-- [ ] **T17.2** Formatar valores monetários como `R$ 1.234,56` nos templates
+- [X] **T17.1** Adicionar ícones SVG inline na sidebar (Dashboard, Contas, Categorias, etc.)
+- [X] **T17.2** Formatar valores monetários como `R$ 1.234,56` nos templates
   - Criar template filter customizado `currency_brl` ou usar `floatformat` + formatação
-- [ ] **T17.3** Adicionar badges de tipo nas categorias (verde "Entrada", vermelho "Saída")
-- [ ] **T17.4** Estilizar paginação da listagem de transações
+- [X] **T17.3** Adicionar badges de tipo nas categorias (verde "Entrada", vermelho "Saída")
+- [X] **T17.4** Estilizar paginação da listagem de transações
   - Botões Previous/Next com estilo do Design System
-- [ ] **T17.5** Adicionar animação de fade nas mensagens de feedback (auto-dismiss em 5s)
-- [ ] **T17.6** Revisar consistência visual de todas as telas com o Design System
+- [X] **T17.5** Adicionar animação de fade nas mensagens de feedback (auto-dismiss em 5s)
+- [X] **T17.6** Revisar consistência visual de todas as telas com o Design System
   - Verificar espaçamentos, cores, bordas, fontes
-- [ ] **T17.7** Adicionar estados de hover e focus em todos os elementos interativos
-- [ ] **T17.8** Garantir que a landing page não é acessível por usuários logados (redirect)
+- [X] **T17.7** Adicionar estados de hover e focus em todos os elementos interativos
+- [X] **T17.8** Garantir que a landing page não é acessível por usuários logados (redirect)
 
 ---
 

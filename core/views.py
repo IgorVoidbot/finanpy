@@ -2,6 +2,7 @@ from datetime import date
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum
+from django.shortcuts import redirect
 from django.views.generic import TemplateView
 
 from accounts.models import Account
@@ -10,6 +11,11 @@ from transactions.models import Transaction
 
 class LandingView(TemplateView):
     template_name = 'landing.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('dashboard')
+        return super().dispatch(request, *args, **kwargs)
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
