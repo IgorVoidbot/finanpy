@@ -422,22 +422,22 @@
 
 ### Sprint 7 — Polimento e Preparação para Produção
 
-#### T18. Validações e Segurança
+#### [X] T18. Validações e Segurança
 
-- [ ] **T18.1** Garantir que todas as views autenticadas usam `LoginRequiredMixin`
-- [ ] **T18.2** Garantir que todas as queries filtram por `user=request.user`
+- [X] **T18.1** Garantir que todas as views autenticadas usam `LoginRequiredMixin`
+- [X] **T18.2** Garantir que todas as queries filtram por `user=request.user`
   - Testar acesso direto a URLs de outro usuário (deve retornar 404)
-- [ ] **T18.3** Validar que valor de transação é sempre positivo no form
-- [ ] **T18.4** Validar que transação só aceita categorias do mesmo tipo (income/expense)
-- [ ] **T18.5** Adicionar `{% csrf_token %}` em todos os formulários (verificar)
-- [ ] **T18.6** Configurar `SECURE_BROWSER_XSS_FILTER = True` e `X_CONTENT_TYPE_OPTIONS` no settings
+- [X] **T18.3** Validar que valor de transação é sempre positivo no form
+- [X] **T18.4** Validar que transação só aceita categorias do mesmo tipo (income/expense)
+- [X] **T18.5** Adicionar `{% csrf_token %}` em todos os formulários (verificar)
+- [X] **T18.6** Configurar `SECURE_BROWSER_XSS_FILTER = True` e `X_CONTENT_TYPE_OPTIONS` no settings
 
-#### T19. Template Filters e Helpers
+#### [X] T19. Template Filters e Helpers
 
-- [ ] **T19.1** Criar `templatetags/` em uma app (ex: `core` ou app dedicada)
+- [X] **T19.1** Criar `templatetags/` em uma app (ex: `core` ou app dedicada)
   - Criar `format_filters.py` com filtro `brl_currency` para formatar Decimal → `R$ X.XXX,XX`
-- [ ] **T19.2** Criar filtro `active_link` para sidebar (marca item ativo por URL)
-- [ ] **T19.3** Registrar templatetags e usar em todos os templates relevantes
+- [X] **T19.2** Criar filtro `active_link` para sidebar (marca item ativo por URL)
+- [X] **T19.3** Registrar templatetags e usar em todos os templates relevantes
 
 #### T20. README e Documentação
 

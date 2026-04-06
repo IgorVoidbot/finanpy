@@ -131,3 +131,8 @@ AUTH_USER_MODEL = 'users.User'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
+
+# Security headers
+SECURE_BROWSER_XSS_FILTER = True
+X_CONTENT_TYPE_OPTIONS = 'nosniff'
+SECURE_CONTENT_TYPE_NOSNIFF = True

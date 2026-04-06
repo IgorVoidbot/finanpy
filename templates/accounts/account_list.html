@@ -39,9 +39,9 @@
                         </td>
                         <td class="px-4 py-3 font-medium tabular-nums">
                             {% if account.current_balance >= 0 %}
-                                <span class="text-emerald-400">{{ account.current_balance|currency_brl }}</span>
+                                <span class="text-emerald-400">{{ account.current_balance|brl_currency }}</span>
                             {% else %}
-                                <span class="text-rose-400">{{ account.current_balance|currency_brl }}</span>
+                                <span class="text-rose-400">{{ account.current_balance|brl_currency }}</span>
                             {% endif %}
                         </td>
                         <td class="px-4 py-3 text-right">

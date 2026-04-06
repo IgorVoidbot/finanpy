@@ -4,116 +4,673 @@
 
 {% block content %}
 
-<div class="min-h-screen bg-gray-950 text-gray-100 flex flex-col">
+<div class="min-h-screen bg-gray-950 text-gray-100 flex flex-col overflow-x-hidden">
 
-    <!-- Navbar pública -->
-    <header class="bg-gray-900/80 backdrop-blur-sm border-b border-gray-700 px-6 py-4 sticky top-0 z-50">
-        <div class="max-w-5xl mx-auto flex items-center justify-between">
-            <span class="text-xl font-bold bg-gradient-to-r from-emerald-400 to-violet-400 bg-clip-text text-transparent">
+    <!-- ============================================================
+         1. NAVBAR STICKY
+         ============================================================ -->
+    <header class="sticky top-0 z-50 bg-gray-900/80 backdrop-blur-sm border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+
+            <!-- Logo -->
+            <span class="text-xl font-bold bg-gradient-to-r from-emerald-400 to-violet-400 bg-clip-text text-transparent tracking-tight">
                 Finanpy
             </span>
-            <div class="flex items-center gap-3">
-                <a
-                    href="{% url 'users:login' %}"
-                    class="text-sm text-gray-400 hover:text-gray-100 transition-colors duration-200"
-                >
+
+            <!-- Nav links -->
+            <nav class="flex items-center gap-2">
+                <a href="{% url 'users:login' %}"
+                   class="text-sm text-gray-400 hover:text-gray-100 font-medium px-4 py-2 rounded-lg transition-colors duration-200">
                     Entrar
                 </a>
-                <a
-                    href="{% url 'users:signup' %}"
-                    class="bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium py-2 px-4 rounded-lg transition-colors duration-200"
-                >
+                <a href="{% url 'users:signup' %}"
+                   class="bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold py-2 px-5 rounded-lg transition-colors duration-200">
                     Cadastrar-se
                 </a>
-            </div>
+            </nav>
+
         </div>
     </header>
 
-    <!-- Hero -->
-    <section class="flex-1 flex items-center justify-center px-6 py-20">
-        <div class="max-w-3xl mx-auto text-center">
-            <h1 class="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-                Controle suas finanças com
-                <span class="bg-gradient-to-r from-emerald-400 to-violet-400 bg-clip-text text-transparent">
-                    inteligência
-                </span>
-            </h1>
-            <p class="text-lg text-gray-400 mb-10 max-w-xl mx-auto">
-                Gerencie contas, categorize transações e visualize seu patrimônio em um único lugar. Simples, seguro e gratuito.
-            </p>
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <a
-                    href="{% url 'users:signup' %}"
-                    class="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-3 px-8 rounded-lg transition-colors duration-200 text-base"
-                >
-                    Cadastre-se grátis
-                </a>
-                <a
-                    href="{% url 'users:login' %}"
-                    class="w-full sm:w-auto border border-gray-600 hover:border-emerald-500 text-gray-300 hover:text-emerald-400 font-medium py-3 px-8 rounded-lg transition-colors duration-200 text-base"
-                >
-                    Fazer login
-                </a>
+
+    <!-- ============================================================
+         2. HERO SECTION
+         ============================================================ -->
+    <section class="relative flex-1 flex items-center justify-center px-6 py-24 md:py-32 overflow-hidden">
+
+        <!-- Decorative glows — pointer-events-none so they never block clicks -->
+        <div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+            <!-- Emerald glow top-left -->
+            <div class="absolute -top-40 -left-40 w-[600px] h-[600px] bg-emerald-500/10 rounded-full blur-3xl"></div>
+            <!-- Violet glow bottom-right -->
+            <div class="absolute -bottom-40 -right-20 w-[500px] h-[500px] bg-violet-500/10 rounded-full blur-3xl"></div>
+            <!-- Subtle center glow -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[300px] bg-violet-500/5 rounded-full blur-3xl"></div>
+        </div>
+
+        <div class="relative max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+
+            <!-- Left: copy -->
+            <div class="flex flex-col items-start gap-6">
+
+                <!-- Badge pill -->
+                <div class="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 rounded-full px-4 py-1.5">
+                    <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                    <span class="text-sm text-emerald-400 font-medium">Controle financeiro inteligente</span>
+                </div>
+
+                <!-- Heading -->
+                <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.08] tracking-tight text-gray-100">
+                    Suas finanças,<br>
+                    sob seu
+                    <span class="bg-gradient-to-r from-emerald-400 to-violet-400 bg-clip-text text-transparent">
+                        controle
+                    </span>
+                </h1>
+
+                <!-- Subtitle -->
+                <p class="text-xl text-gray-400 leading-relaxed max-w-lg">
+                    Gerencie contas bancárias, categorize transações e acompanhe seu patrimônio em tempo real. Tudo em um único lugar, simples e gratuito.
+                </p>
+
+                <!-- CTAs -->
+                <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                    <a href="{% url 'users:signup' %}"
+                       class="inline-flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 px-8 rounded-xl transition-colors duration-200 text-base">
+                        Começar agora — grátis
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+                        </svg>
+                    </a>
+                    <a href="{% url 'users:login' %}"
+                       class="inline-flex items-center justify-center gap-2 border border-gray-700 hover:border-gray-500 text-gray-300 hover:text-gray-100 font-semibold py-3 px-8 rounded-xl transition-colors duration-200 text-base">
+                        Fazer login
+                    </a>
+                </div>
+
+                <!-- Social proof hint -->
+                <p class="text-xs text-gray-500">Sem cartão de crédito. Sem compromisso. 100% gratuito.</p>
+
+            </div>
+
+            <!-- Right: mock dashboard card -->
+            <div class="hidden lg:flex justify-center items-center">
+                <div class="relative w-full max-w-sm">
+
+                    <!-- Subtle glow behind card -->
+                    <div class="pointer-events-none absolute inset-0 bg-emerald-500/10 rounded-3xl blur-2xl scale-110" aria-hidden="true"></div>
+
+                    <!-- Main balance card -->
+                    <div class="relative bg-gray-900 border border-gray-700 rounded-2xl p-6 shadow-2xl">
+
+                        <!-- Card header -->
+                        <div class="flex items-center justify-between mb-5">
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase tracking-wider font-medium">Patrimônio total</p>
+                                <p class="text-3xl font-bold text-gray-100 mt-1">R$ 12.847,50</p>
+                            </div>
+                            <div class="w-10 h-10 bg-emerald-500/15 rounded-xl flex items-center justify-center">
+                                <svg class="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <!-- Month summary pills -->
+                        <div class="grid grid-cols-2 gap-3 mb-5">
+                            <div class="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3">
+                                <p class="text-xs text-gray-500 mb-1">Entradas</p>
+                                <p class="text-base font-semibold text-emerald-400">+ R$ 5.200,00</p>
+                            </div>
+                            <div class="bg-rose-500/10 border border-rose-500/20 rounded-xl p-3">
+                                <p class="text-xs text-gray-500 mb-1">Saídas</p>
+                                <p class="text-base font-semibold text-rose-400">- R$ 2.340,00</p>
+                            </div>
+                        </div>
+
+                        <!-- Divider -->
+                        <div class="border-t border-gray-800 mb-4"></div>
+
+                        <!-- Recent transactions mini-list -->
+                        <p class="text-xs text-gray-500 uppercase tracking-wider font-medium mb-3">Últimas transações</p>
+                        <div class="space-y-3">
+
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 bg-emerald-500/15 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-200">Salário</p>
+                                        <p class="text-xs text-gray-500">Hoje</p>
+                                    </div>
+                                </div>
+                                <span class="text-sm font-semibold text-emerald-400">+ R$ 4.500,00</span>
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 bg-rose-500/15 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <svg class="w-4 h-4 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 16H4L5 9z"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-200">Supermercado</p>
+                                        <p class="text-xs text-gray-500">Ontem</p>
+                                    </div>
+                                </div>
+                                <span class="text-sm font-semibold text-rose-400">- R$ 340,00</span>
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 bg-rose-500/15 rounded-lg flex items-center justify-center flex-shrink-0">
+                                        <svg class="w-4 h-4 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-200">Aluguel</p>
+                                        <p class="text-xs text-gray-500">04/04</p>
+                                    </div>
+                                </div>
+                                <span class="text-sm font-semibold text-rose-400">- R$ 1.500,00</span>
+                            </div>
+
+                        </div>
+
+                        <!-- Bottom badge -->
+                        <div class="mt-5 pt-4 border-t border-gray-800 flex items-center gap-2">
+                            <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                            <span class="text-xs text-gray-500">Atualizado em tempo real</span>
+                        </div>
+
+                    </div>
+
+                    <!-- Floating mini-card: account badge -->
+                    <div class="absolute -top-4 -right-4 bg-violet-500/20 border border-violet-500/40 rounded-xl px-3 py-2 backdrop-blur-sm">
+                        <p class="text-xs text-violet-300 font-medium">3 contas ativas</p>
+                    </div>
+
+                    <!-- Floating mini-card: category badge -->
+                    <div class="absolute -bottom-4 -left-4 bg-emerald-500/20 border border-emerald-500/40 rounded-xl px-3 py-2 backdrop-blur-sm">
+                        <p class="text-xs text-emerald-300 font-medium">12 categorias</p>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- ============================================================
+         3. STATS SECTION
+         ============================================================ -->
+    <section class="border-y border-gray-800 bg-gray-900/40">
+        <div class="max-w-7xl mx-auto px-6 py-10">
+            <div class="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-gray-800 gap-0">
+
+                <div class="flex flex-col items-center text-center px-8 py-6 sm:py-0">
+                    <span class="text-4xl font-bold bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent mb-2">4</span>
+                    <p class="text-sm font-semibold text-gray-200">Tipos de conta</p>
+                    <p class="text-xs text-gray-500 mt-1">Corrente, poupança, carteira e investimento</p>
+                </div>
+
+                <div class="flex flex-col items-center text-center px-8 py-6 sm:py-0">
+                    <span class="text-4xl font-bold bg-gradient-to-r from-violet-400 to-violet-300 bg-clip-text text-transparent mb-2">Auto</span>
+                    <p class="text-sm font-semibold text-gray-200">Categorias automáticas</p>
+                    <p class="text-xs text-gray-500 mt-1">Pré-configuradas para você começar agora</p>
+                </div>
+
+                <div class="flex flex-col items-center text-center px-8 py-6 sm:py-0">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pulse"></div>
+                        <span class="text-4xl font-bold bg-gradient-to-r from-emerald-400 to-violet-400 bg-clip-text text-transparent">Live</span>
+                    </div>
+                    <p class="text-sm font-semibold text-gray-200">Dashboard em tempo real</p>
+                    <p class="text-xs text-gray-500 mt-1">Saldo e resumo sempre atualizados</p>
+                </div>
+
             </div>
         </div>
     </section>
 
-    <!-- Funcionalidades -->
-    <section class="px-6 py-16 bg-gray-900/40">
-        <div class="max-w-5xl mx-auto">
-            <h2 class="text-2xl font-bold text-gray-100 text-center mb-10">
-                Tudo que você precisa para organizar seu dinheiro
+
+    <!-- ============================================================
+         4. FEATURES SECTION
+         ============================================================ -->
+    <section class="px-6 py-24">
+        <div class="max-w-7xl mx-auto">
+
+            <!-- Section header -->
+            <div class="text-center mb-16">
+                <p class="text-sm font-semibold text-violet-400 uppercase tracking-widest mb-3">Funcionalidades</p>
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-100 mb-4">
+                    Tudo que você precisa para
+                    <span class="bg-gradient-to-r from-emerald-400 to-violet-400 bg-clip-text text-transparent">organizar seu dinheiro</span>
+                </h2>
+                <p class="text-gray-400 max-w-xl mx-auto text-base">
+                    Ferramentas simples e eficazes para quem quer ter controle real sobre as próprias finanças.
+                </p>
+            </div>
+
+            <!-- Feature grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                <!-- Feature 1: Contas bancárias -->
+                <div class="group bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-emerald-500/50 transition-all duration-300 hover:-translate-y-1">
+                    <div class="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center mb-5 group-hover:bg-emerald-500/20 transition-colors duration-300">
+                        <svg class="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-100 mb-2">Contas bancárias</h3>
+                    <p class="text-sm text-gray-400 leading-relaxed">
+                        Cadastre contas correntes, poupanças, carteiras e investimentos. O saldo é recalculado automaticamente a cada transação.
+                    </p>
+                </div>
+
+                <!-- Feature 2: Categorias inteligentes -->
+                <div class="group bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-violet-500/50 transition-all duration-300 hover:-translate-y-1">
+                    <div class="w-12 h-12 bg-violet-500/10 rounded-xl flex items-center justify-center mb-5 group-hover:bg-violet-500/20 transition-colors duration-300">
+                        <svg class="w-6 h-6 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-100 mb-2">Categorias inteligentes</h3>
+                    <p class="text-sm text-gray-400 leading-relaxed">
+                        Separe receitas e despesas por categorias personalizadas. Ao criar sua conta, categorias padrão já estão prontas para uso imediato.
+                    </p>
+                </div>
+
+                <!-- Feature 3: Transações organizadas -->
+                <div class="group bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-emerald-500/50 transition-all duration-300 hover:-translate-y-1">
+                    <div class="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center mb-5 group-hover:bg-emerald-500/20 transition-colors duration-300">
+                        <svg class="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-100 mb-2">Transações organizadas</h3>
+                    <p class="text-sm text-gray-400 leading-relaxed">
+                        Registre entradas e saídas com data, descrição, conta e categoria. Filtre e pesquise por qualquer critério com facilidade.
+                    </p>
+                </div>
+
+                <!-- Feature 4: Dashboard completo -->
+                <div class="group bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-violet-500/50 transition-all duration-300 hover:-translate-y-1">
+                    <div class="w-12 h-12 bg-violet-500/10 rounded-xl flex items-center justify-center mb-5 group-hover:bg-violet-500/20 transition-colors duration-300">
+                        <svg class="w-6 h-6 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-100 mb-2">Dashboard completo</h3>
+                    <p class="text-sm text-gray-400 leading-relaxed">
+                        Visualize patrimônio total, receitas mensais, despesas por categoria e saldo de cada conta em um painel centralizado e intuitivo.
+                    </p>
+                </div>
+
+                <!-- Feature 5: Saldo automático -->
+                <div class="group bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-emerald-500/50 transition-all duration-300 hover:-translate-y-1">
+                    <div class="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center mb-5 group-hover:bg-emerald-500/20 transition-colors duration-300">
+                        <svg class="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-100 mb-2">Saldo automático</h3>
+                    <p class="text-sm text-gray-400 leading-relaxed">
+                        Cada transação recalcula o saldo da conta associada instantaneamente. Editar ou excluir uma movimentação ajusta tudo de forma precisa.
+                    </p>
+                </div>
+
+                <!-- Feature 6: Segurança total -->
+                <div class="group bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-violet-500/50 transition-all duration-300 hover:-translate-y-1">
+                    <div class="w-12 h-12 bg-violet-500/10 rounded-xl flex items-center justify-center mb-5 group-hover:bg-violet-500/20 transition-colors duration-300">
+                        <svg class="w-6 h-6 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-100 mb-2">Segurança total</h3>
+                    <p class="text-sm text-gray-400 leading-relaxed">
+                        Seus dados são seus. Cada usuário enxerga apenas suas próprias contas, categorias e transações — nunca os dados de outra pessoa.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================================
+         5. COMO FUNCIONA SECTION
+         ============================================================ -->
+    <section class="px-6 py-24 bg-gray-900/50 border-y border-gray-800">
+        <div class="max-w-7xl mx-auto">
+
+            <!-- Section header -->
+            <div class="text-center mb-16">
+                <p class="text-sm font-semibold text-emerald-400 uppercase tracking-widest mb-3">Simples assim</p>
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-100 mb-4">Como funciona</h2>
+                <p class="text-gray-400 max-w-lg mx-auto">Em três passos você já tem controle completo das suas finanças.</p>
+            </div>
+
+            <!-- Steps -->
+            <div class="relative">
+
+                <!-- Horizontal connector line (desktop only) -->
+                <div class="hidden md:block absolute top-10 left-[calc(16.666%+2rem)] right-[calc(16.666%+2rem)] h-px bg-gradient-to-r from-emerald-500/30 via-violet-500/30 to-emerald-500/30" aria-hidden="true"></div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8">
+
+                    <!-- Step 1 -->
+                    <div class="flex flex-col items-center text-center">
+                        <div class="relative w-20 h-20 mb-6">
+                            <!-- Step number with gradient ring -->
+                            <div class="w-20 h-20 rounded-2xl bg-gray-900 border-2 border-emerald-500/60 flex items-center justify-center">
+                                <span class="text-3xl font-black bg-gradient-to-br from-emerald-400 to-emerald-300 bg-clip-text text-transparent">1</span>
+                            </div>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-100 mb-2">Crie sua conta gratuita</h3>
+                        <p class="text-sm text-gray-400 leading-relaxed max-w-xs">
+                            Cadastre-se com nome e e-mail em menos de um minuto. Sem burocracia, sem cobranças.
+                        </p>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="flex flex-col items-center text-center">
+                        <div class="relative w-20 h-20 mb-6">
+                            <div class="w-20 h-20 rounded-2xl bg-gray-900 border-2 border-violet-500/60 flex items-center justify-center">
+                                <span class="text-3xl font-black bg-gradient-to-br from-violet-400 to-violet-300 bg-clip-text text-transparent">2</span>
+                            </div>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-100 mb-2">Adicione contas e categorias</h3>
+                        <p class="text-sm text-gray-400 leading-relaxed max-w-xs">
+                            Configure suas contas bancárias e personalize as categorias de receitas e despesas para o seu perfil.
+                        </p>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="flex flex-col items-center text-center">
+                        <div class="relative w-20 h-20 mb-6">
+                            <div class="w-20 h-20 rounded-2xl bg-gray-900 border-2 border-emerald-500/60 flex items-center justify-center">
+                                <span class="text-3xl font-black bg-gradient-to-br from-emerald-400 to-violet-400 bg-clip-text text-transparent">3</span>
+                            </div>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-100 mb-2">Registre suas transações</h3>
+                        <p class="text-sm text-gray-400 leading-relaxed max-w-xs">
+                            Informe entradas e saídas e acompanhe seu patrimônio evoluir no dashboard em tempo real.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- ============================================================
+         6. HIGHLIGHT SECTION (texto esquerda, mock card direita)
+         ============================================================ -->
+    <section class="px-6 py-24">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+
+                <!-- Left: copy -->
+                <div class="flex flex-col gap-6">
+
+                    <!-- Badge -->
+                    <div class="inline-flex items-center gap-2 w-fit bg-emerald-500/10 border border-emerald-500/30 rounded-full px-4 py-1.5">
+                        <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                        <span class="text-sm text-emerald-400 font-medium">Saldo atualizado em tempo real</span>
+                    </div>
+
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-100 leading-tight">
+                        Controle total das suas finanças,
+                        <span class="bg-gradient-to-r from-emerald-400 to-violet-400 bg-clip-text text-transparent">na palma da mão</span>
+                    </h2>
+
+                    <p class="text-gray-400 text-base leading-relaxed">
+                        Chega de planilhas confusas e anotações perdidas. Com o Finanpy, você tem uma visão clara e completa de tudo: patrimônio, receitas mensais, despesas por categoria e o saldo de cada conta — tudo em um único painel.
+                    </p>
+
+                    <ul class="space-y-3">
+                        <li class="flex items-center gap-3 text-sm text-gray-300">
+                            <div class="w-5 h-5 bg-emerald-500/15 rounded-full flex items-center justify-center flex-shrink-0">
+                                <svg class="w-3 h-3 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                            Saldo recalculado automaticamente a cada transação
+                        </li>
+                        <li class="flex items-center gap-3 text-sm text-gray-300">
+                            <div class="w-5 h-5 bg-emerald-500/15 rounded-full flex items-center justify-center flex-shrink-0">
+                                <svg class="w-3 h-3 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                            Resumo mensal de receitas e despesas no dashboard
+                        </li>
+                        <li class="flex items-center gap-3 text-sm text-gray-300">
+                            <div class="w-5 h-5 bg-emerald-500/15 rounded-full flex items-center justify-center flex-shrink-0">
+                                <svg class="w-3 h-3 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                            Dados 100% privados — apenas você acessa suas informações
+                        </li>
+                        <li class="flex items-center gap-3 text-sm text-gray-300">
+                            <div class="w-5 h-5 bg-emerald-500/15 rounded-full flex items-center justify-center flex-shrink-0">
+                                <svg class="w-3 h-3 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                            Interface pensada para ser simples e rápida de usar
+                        </li>
+                    </ul>
+
+                    <a href="{% url 'users:signup' %}"
+                       class="inline-flex items-center gap-2 w-fit bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 px-7 rounded-xl transition-colors duration-200 text-sm">
+                        Experimentar grátis
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+                        </svg>
+                    </a>
+
+                </div>
+
+                <!-- Right: dashboard mock card -->
+                <div class="flex justify-center lg:justify-end">
+                    <div class="relative w-full max-w-sm">
+
+                        <!-- Glow behind card -->
+                        <div class="pointer-events-none absolute inset-0 bg-violet-500/10 rounded-3xl blur-2xl scale-110" aria-hidden="true"></div>
+
+                        <!-- Card -->
+                        <div class="relative bg-gray-900 border border-gray-700 rounded-2xl overflow-hidden shadow-2xl">
+
+                            <!-- Card top bar -->
+                            <div class="bg-gray-800/60 px-5 py-3 flex items-center gap-2 border-b border-gray-700">
+                                <div class="w-3 h-3 bg-rose-500/60 rounded-full"></div>
+                                <div class="w-3 h-3 bg-amber-500/60 rounded-full"></div>
+                                <div class="w-3 h-3 bg-emerald-500/60 rounded-full"></div>
+                                <span class="text-xs text-gray-500 ml-2">Dashboard — Abril 2026</span>
+                            </div>
+
+                            <div class="p-5 space-y-4">
+
+                                <!-- Summary cards row -->
+                                <div class="grid grid-cols-3 gap-3">
+                                    <div class="bg-gray-800 rounded-xl p-3 text-center">
+                                        <p class="text-xs text-gray-500 mb-1">Patrimônio</p>
+                                        <p class="text-sm font-bold text-gray-100">R$ 12.847</p>
+                                    </div>
+                                    <div class="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-3 text-center">
+                                        <p class="text-xs text-gray-500 mb-1">Entradas</p>
+                                        <p class="text-sm font-bold text-emerald-400">R$ 5.200</p>
+                                    </div>
+                                    <div class="bg-rose-500/10 border border-rose-500/20 rounded-xl p-3 text-center">
+                                        <p class="text-xs text-gray-500 mb-1">Saídas</p>
+                                        <p class="text-sm font-bold text-rose-400">R$ 2.340</p>
+                                    </div>
+                                </div>
+
+                                <!-- Category breakdown bars -->
+                                <div>
+                                    <p class="text-xs text-gray-500 uppercase tracking-wider font-medium mb-3">Gastos por categoria</p>
+                                    <div class="space-y-2.5">
+
+                                        <div>
+                                            <div class="flex justify-between text-xs mb-1">
+                                                <span class="text-gray-400">Moradia</span>
+                                                <span class="text-gray-500">R$ 1.500</span>
+                                            </div>
+                                            <div class="h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                                                <div class="h-full w-[64%] bg-gradient-to-r from-rose-500 to-rose-400 rounded-full"></div>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <div class="flex justify-between text-xs mb-1">
+                                                <span class="text-gray-400">Alimentação</span>
+                                                <span class="text-gray-500">R$ 490</span>
+                                            </div>
+                                            <div class="h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                                                <div class="h-full w-[21%] bg-gradient-to-r from-rose-500 to-rose-400 rounded-full"></div>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <div class="flex justify-between text-xs mb-1">
+                                                <span class="text-gray-400">Transporte</span>
+                                                <span class="text-gray-500">R$ 350</span>
+                                            </div>
+                                            <div class="h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                                                <div class="h-full w-[15%] bg-gradient-to-r from-amber-500 to-amber-400 rounded-full"></div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <!-- Account balances -->
+                                <div class="border-t border-gray-800 pt-4">
+                                    <p class="text-xs text-gray-500 uppercase tracking-wider font-medium mb-3">Suas contas</p>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-6 h-6 bg-violet-500/20 rounded-md flex items-center justify-center">
+                                                    <div class="w-2 h-2 bg-violet-400 rounded-full"></div>
+                                                </div>
+                                                <span class="text-xs text-gray-400">Conta Corrente</span>
+                                            </div>
+                                            <span class="text-xs font-semibold text-emerald-400">R$ 8.347,50</span>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center gap-2">
+                                                <div class="w-6 h-6 bg-emerald-500/20 rounded-md flex items-center justify-center">
+                                                    <div class="w-2 h-2 bg-emerald-400 rounded-full"></div>
+                                                </div>
+                                                <span class="text-xs text-gray-400">Poupança</span>
+                                            </div>
+                                            <span class="text-xs font-semibold text-emerald-400">R$ 4.500,00</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ============================================================
+         7. CTA FINAL SECTION
+         ============================================================ -->
+    <section class="relative px-6 py-24 overflow-hidden">
+
+        <!-- Background glows -->
+        <div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-emerald-500/8 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[500px] h-[300px] bg-violet-500/8 rounded-full blur-3xl"></div>
+        </div>
+
+        <div class="relative max-w-3xl mx-auto text-center">
+
+            <!-- Badge -->
+            <div class="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-500/30 rounded-full px-4 py-1.5 mb-6">
+                <svg class="w-4 h-4 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                </svg>
+                <span class="text-sm text-violet-400 font-medium">Comece hoje mesmo</span>
+            </div>
+
+            <h2 class="text-4xl md:text-5xl font-bold text-gray-100 leading-tight mb-5">
+                Pronto para ter controle real
+                <span class="bg-gradient-to-r from-emerald-400 to-violet-400 bg-clip-text text-transparent"> das suas finanças?</span>
             </h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-                <!-- Card: Controle de Contas -->
-                <div class="bg-gray-900 border border-gray-700 rounded-xl p-6 hover:border-emerald-500/50 transition-colors duration-200">
-                    <div class="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-semibold text-gray-100 mb-2">Controle de Contas</h3>
-                    <p class="text-sm text-gray-400">
-                        Cadastre contas correntes, poupanças, carteiras e investimentos. O saldo é atualizado automaticamente a cada transação registrada.
-                    </p>
-                </div>
+            <p class="text-lg text-gray-400 mb-10 max-w-xl mx-auto">
+                Junte-se a quem já decidiu parar de improvisar. Cadastro rápido, sem cartão de crédito e gratuito para sempre.
+            </p>
 
-                <!-- Card: Categorias Inteligentes -->
-                <div class="bg-gray-900 border border-gray-700 rounded-xl p-6 hover:border-violet-500/50 transition-colors duration-200">
-                    <div class="w-10 h-10 bg-violet-500/10 rounded-lg flex items-center justify-center mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-semibold text-gray-100 mb-2">Categorias Inteligentes</h3>
-                    <p class="text-sm text-gray-400">
-                        Organize suas entradas e saídas em categorias personalizadas. Categorias padrão já vêm configuradas para você começar imediatamente.
-                    </p>
-                </div>
-
-                <!-- Card: Dashboard Completo -->
-                <div class="bg-gray-900 border border-gray-700 rounded-xl p-6 hover:border-emerald-500/50 transition-colors duration-200">
-                    <div class="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                        </svg>
-                    </div>
-                    <h3 class="text-lg font-semibold text-gray-100 mb-2">Dashboard Completo</h3>
-                    <p class="text-sm text-gray-400">
-                        Visualize seu patrimônio total, receitas, despesas e saldo de cada conta em um painel intuitivo e atualizado em tempo real.
-                    </p>
-                </div>
-
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="{% url 'users:signup' %}"
+                   class="inline-flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-4 px-10 rounded-xl transition-colors duration-200 text-base">
+                    Criar conta gratuita
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+                    </svg>
+                </a>
+                <a href="{% url 'users:login' %}"
+                   class="inline-flex items-center justify-center gap-2 border border-gray-700 hover:border-gray-500 text-gray-300 hover:text-gray-100 font-semibold py-4 px-10 rounded-xl transition-colors duration-200 text-base">
+                    Já tenho conta
+                </a>
             </div>
+
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="px-6 py-8 border-t border-gray-800">
-        <p class="text-sm text-gray-500 text-center">
-            &copy; 2026 Finanpy. Todos os direitos reservados.
-        </p>
+
+    <!-- ============================================================
+         8. FOOTER
+         ============================================================ -->
+    <footer class="border-t border-gray-800 px-6 py-8">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+
+            <!-- Logo -->
+            <span class="text-lg font-bold bg-gradient-to-r from-emerald-400 to-violet-400 bg-clip-text text-transparent">
+                Finanpy
+            </span>
+
+            <!-- Footer links -->
+            <div class="flex items-center gap-6">
+                <a href="{% url 'users:login' %}"
+                   class="text-sm text-gray-500 hover:text-gray-300 transition-colors duration-200">
+                    Entrar
+                </a>
+                <a href="{% url 'users:signup' %}"
+                   class="text-sm text-gray-500 hover:text-gray-300 transition-colors duration-200">
+                    Cadastrar
+                </a>
+            </div>
+
+            <!-- Copyright -->
+            <p class="text-sm text-gray-600">
+                &copy; 2026 Finanpy. Todos os direitos reservados.
+            </p>
+
+        </div>
     </footer>
 
 </div>

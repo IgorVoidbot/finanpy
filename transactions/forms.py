@@ -32,3 +32,22 @@ class TransactionForm(forms.ModelForm):
         if user is not None:
             self.fields['account'].queryset = Account.objects.filter(user=user)
             self.fields['category'].queryset = Category.objects.filter(user=user)
+
+    def clean_amount(self):
+        amount = self.cleaned_data.get('amount')
+        if amount is not None and amount <= 0:
+            raise forms.ValidationError('O valor da transação deve ser maior que zero.')
+        return amount
+
+    def clean(self):
+        cleaned_data = super().clean()
+        transaction_type = cleaned_data.get('transaction_type')
+        category = cleaned_data.get('category')
+
+        if transaction_type and category:
+            if category.transaction_type != transaction_type:
+                raise forms.ValidationError(
+                    'A categoria selecionada não corresponde ao tipo da transação.'
+                )
+
+        return cleaned_data

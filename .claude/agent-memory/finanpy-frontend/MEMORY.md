@@ -1,1 +1,2 @@
 - [Finanpy Template Structure](project_templates.md) — template hierarchy, block names, URL names, component locations, and active-sidebar detection pattern
+- [Templatetag filter names](feedback_templatetag_names.md) — correct names: `brl_currency` (not currency_brl), `active_link` with full namespaced view_name

@@ -25,7 +25,7 @@
                 </svg>
             </div>
         </div>
-        <p class="text-2xl font-bold text-emerald-400">{{ total_balance|currency_brl }}</p>
+        <p class="text-2xl font-bold text-emerald-400">{{ total_balance|brl_currency }}</p>
     </div>
 
     <!-- Entradas do Mês -->
@@ -39,7 +39,7 @@
                 </svg>
             </div>
         </div>
-        <p class="text-2xl font-bold text-emerald-400">{{ monthly_income|currency_brl }}</p>
+        <p class="text-2xl font-bold text-emerald-400">{{ monthly_income|brl_currency }}</p>
     </div>
 
     <!-- Saídas do Mês -->
@@ -53,7 +53,7 @@
                 </svg>
             </div>
         </div>
-        <p class="text-2xl font-bold text-rose-400">{{ monthly_expense|currency_brl }}</p>
+        <p class="text-2xl font-bold text-rose-400">{{ monthly_expense|brl_currency }}</p>
     </div>
 
     <!-- Balanço do Mês -->
@@ -68,7 +68,7 @@
             </div>
         </div>
         <p class="text-2xl font-bold {% if monthly_balance >= 0 %}text-emerald-400{% else %}text-rose-400{% endif %}">
-            {{ monthly_balance|currency_brl }}
+            {{ monthly_balance|brl_currency }}
         </p>
     </div>
 
@@ -122,7 +122,7 @@
                                 <!-- Valor -->
                                 <td class="px-3 py-3 text-right font-medium whitespace-nowrap
                                     {% if t.transaction_type == 'income' %}text-emerald-400{% else %}text-rose-400{% endif %}">
-                                    {{ t.amount|currency_brl }}
+                                    {{ t.amount|brl_currency }}
                                 </td>
 
                             </tr>
@@ -156,7 +156,7 @@
                     <li>
                         <div class="flex items-center justify-between mb-1.5">
                             <span class="text-sm text-gray-300">{{ item.category__name }}</span>
-                            <span class="text-sm font-medium text-rose-400">{{ item.total|currency_brl }}</span>
+                            <span class="text-sm font-medium text-rose-400">{{ item.total|brl_currency }}</span>
                         </div>
                         <div class="bg-gray-800 rounded-full h-1.5">
                             <div
