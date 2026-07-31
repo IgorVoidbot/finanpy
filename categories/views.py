@@ -22,8 +22,12 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
     template_name = 'categories/category_form.html'
     success_url = reverse_lazy('categories:category_list')
 
-    def form_valid(self, form):
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
         form.instance.user = self.request.user
+        return form
+
+    def form_valid(self, form):
         messages.success(self.request, 'Categoria criada com sucesso!')
         return super().form_valid(form)
 
