@@ -5,14 +5,19 @@ from django.urls import reverse_lazy
 from django.views import View
 
 from .forms import ProfileUpdateForm, UserUpdateForm
+from .models import Profile
 
 
 class ProfileUpdateView(LoginRequiredMixin, View):
     template_name = 'profiles/profile_edit.html'
 
     def get(self, request, *args, **kwargs):
+        profile, _ = Profile.objects.get_or_create(
+            user=request.user,
+            defaults={'display_name': request.user.first_name},
+        )
         user_form = UserUpdateForm(instance=request.user)
-        profile_form = ProfileUpdateForm(instance=request.user.profile)
+        profile_form = ProfileUpdateForm(instance=profile)
         context = {
             'user_form': user_form,
             'profile_form': profile_form,
@@ -20,8 +25,12 @@ class ProfileUpdateView(LoginRequiredMixin, View):
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
+        profile, _ = Profile.objects.get_or_create(
+            user=request.user,
+            defaults={'display_name': request.user.first_name},
+        )
         user_form = UserUpdateForm(request.POST, instance=request.user)
-        profile_form = ProfileUpdateForm(request.POST, instance=request.user.profile)
+        profile_form = ProfileUpdateForm(request.POST, instance=profile)
 
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()

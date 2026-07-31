@@ -420,7 +420,7 @@
 
 ---
 
-### Sprint 7 — Polimento e Preparação para Produção
+### [X] Sprint 7 — Polimento e Preparação para Produção
 
 #### [X] T18. Validações e Segurança
 
@@ -439,41 +439,40 @@
 - [X] **T19.2** Criar filtro `active_link` para sidebar (marca item ativo por URL)
 - [X] **T19.3** Registrar templatetags e usar em todos os templates relevantes
 
-#### T20. README e Documentação
+#### [X] T20. README e Documentação
 
-- [ ] **T20.1** Criar `README.md` com:
+- [X] **T20.1** Criar `README.md` com:
   - Descrição do projeto
   - Stack tecnológica
   - Instruções de instalação e setup local
   - Comandos úteis (runserver, migrate, createsuperuser)
   - Estrutura de diretórios
-- [ ] **T20.2** Documentar variáveis de settings que podem ser customizadas
+- [X] **T20.2** Documentar variáveis de settings que podem ser customizadas
 
 ---
 
 ### Sprint 8 — Testes (Sprint Final)
 
-#### T21. Setup de Testes
+#### [X] T21. Setup de Testes
 
-- [ ] **T21.1** Configurar `pytest` e `pytest-django` no projeto
+- [X] **T21.1** Configurar `pytest` e `pytest-django` no projeto
   - Adicionar ao `requirements.txt`
   - Criar `pytest.ini` ou `pyproject.toml` com configuração Django
-- [ ] **T21.2** Criar fixtures base: usuário de teste, conta, categoria, transação
+- [X] **T21.2** Criar fixtures base: usuário de teste, conta, categoria, transação
 
 #### T22. Testes por App
 
-- [ ] **T22.1** Testes `users`: cadastro, login, login com e-mail inválido, logout
-- [ ] **T22.2** Testes `profiles`: edição de perfil, criação automática via signal
-- [ ] **T22.3** Testes `accounts`: CRUD completo, saldo inicial = saldo atual na criação
-- [ ] **T22.4** Testes `categories`: CRUD, categorias padrão via signal, proteção de exclusão
-- [ ] **T22.5** Testes `transactions`: CRUD, atualização de saldo, filtros
-- [ ] **T22.6** Testes `dashboard`: cálculos corretos de saldos e totais mensais
-- [ ] **T22.7** Testes de segurança: acesso a dados de outro usuário retorna 404
+- [X] **T22.1** Testes `users`: cadastro, login, login com e-mail inválido, logout
+- [X] **T22.2** Testes `profiles`: edição de perfil, criação automática via signal
+- [X] **T22.3** Testes `accounts`: CRUD completo, saldo inicial = saldo atual na criação
+- [X] **T22.4** Testes `categories`: CRUD, categorias padrão via signal, proteção de exclusão
+- [X] **T22.5** Testes `transactions`: CRUD, atualização de saldo, filtros
+- [X] **T22.6** Testes `dashboard`: cálculos corretos de saldos e totais mensais
+- [X] **T22.7** Testes de segurança: acesso a dados de outro usuário retorna 404
 
 ---
 
 ### Sprint 9 — Docker (Sprint Final)
-
 #### T23. Dockerização
 
 - [ ] **T23.1** Criar `Dockerfile` com Python 3.12 + pip install de requirements
