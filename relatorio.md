@@ -786,7 +786,15 @@ Confirmadas via MCP context7 contra a versão instalada e registradas no docstri
 - **Execução síncrona no MVP**, com estado de carregamento na interface. Fila assíncrona fica como evolução futura, para não violar o RNF07 (simplicidade).
 - **Degradação graciosa**: indisponibilidade da API, chave ausente ou feature flag desligada não quebram o dashboard. `run_analysis_for_user()` nunca propaga exceção.
 - **Testes sem rede**: a suíte substitui o agente por um dublê; nenhuma chamada real à API DeepSeek.
-- **Teto de iterações em duas camadas**: o middleware encerra o loop e o `recursion_limit` cobre os passos que ele não conta.
+- **Teto de iterações em duas camadas**: o `ModelCallLimitMiddleware` encerra o loop de forma limpa e o `recursion_limit` do grafo é só rede de segurança. O grafo gasta 4 super-steps por iteração — `before_model`, `model`, `after_model`, `tools` —, porque os hooks do middleware também são nós; o limite é calculado em cima disso.
+
+### Limitação conhecida — transações com data futura
+
+O `current_balance` da conta soma **todas** as transações, sem filtro de data (`Account.update_account_balance()`), enquanto as tools do agente agregam com `date__lte=today`. Uma transação lançada com data futura entra no saldo e fica de fora dos totais por categoria e da série mensal.
+
+**Decidido manter assim** (02/08/2026): é o comportamento que o dashboard sempre teve, e alterá-lo exigiria mexer na agregação de saldo, que é central e coberta por testes. A inconsistência não é da IA — existiria em qualquer relatório construído sobre esses agregados.
+
+Efeito prático: quando existe transação com data futura, o agente tende a apontar a diferença no diagnóstico (ex.: "uma despesa de R$ 110,00 ainda não refletida nas categorias de gastos"). É observação correta sobre os dados, não alucinação.
 
 ### Validação da conexão (T24.6)
 
