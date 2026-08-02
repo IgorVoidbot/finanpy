@@ -1,3 +1,5 @@
+import re
+
 import pytest
 from django.contrib.auth import get_user_model
 from django.urls import reverse
@@ -102,3 +104,26 @@ class TestLogout:
         response = client.get(reverse('dashboard'))
         assert response.status_code == 302
         assert response.url.startswith(reverse('users:login'))
+
+    def test_logout_rejects_get(self, client, user):
+        """Desde o Django 5 a LogoutView só aceita POST — um GET dá 405."""
+        client.force_login(user)
+
+        assert client.get(reverse('users:logout')).status_code == 405
+
+    def test_navbar_logs_out_with_a_post_form(self, client, user):
+        """Guarda de regressão: um link de logout renderiza a tela de erro 405.
+
+        Os outros testes chamam a view direto por POST e passariam mesmo com a
+        navbar quebrada — só verificando o HTML dá para pegar isso.
+        """
+        client.force_login(user)
+        body = client.get(reverse('dashboard')).content.decode()
+        logout_url = reverse('users:logout')
+
+        assert f'href="{logout_url}"' not in body
+        assert re.search(
+            rf'<form[^>]*method="post"[^>]*action="{logout_url}"'
+            rf'|<form[^>]*action="{logout_url}"[^>]*method="post"',
+            body,
+        )

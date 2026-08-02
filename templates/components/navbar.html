@@ -28,12 +28,16 @@
             <span class="text-sm text-gray-400">
                 Olá, {{ user.first_name|default:user.email }}
             </span>
-            <a
-                href="{% url 'users:logout' %}"
-                class="text-sm text-gray-400 hover:text-rose-400 transition-colors duration-200"
-            >
-                Sair
-            </a>
+            <!-- LogoutView exige POST desde o Django 5 — um link viraria 405 -->
+            <form method="post" action="{% url 'users:logout' %}">
+                {% csrf_token %}
+                <button
+                    type="submit"
+                    class="text-sm text-gray-400 hover:text-rose-400 transition-colors duration-200"
+                >
+                    Sair
+                </button>
+            </form>
         </div>
 
     </div>
