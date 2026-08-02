@@ -542,35 +542,41 @@
 
 #### T27. Agente LangChain 1.0 + DeepSeek
 
-- [ ] **T27.1** Consultar a documentação atual do LangChain 1.0 via MCP context7 **antes de codar**
+- [X] **T27.1** Consultar a documentação atual do LangChain 1.0 via MCP context7 **antes de codar**
   - Tópicos: construção de agente, definição de tools, saída estruturada, configuração de modelo e limites de iteração
   - Registrar no código as APIs efetivamente usadas (evita divergência com versões antigas)
-- [ ] **T27.2** Criar `ai/prompts.py` com o system prompt do especialista em finanças pessoais
+  - APIs confirmadas e documentadas no docstring de `ai/agent.py`: `create_agent`, `ToolStrategy`, `ModelCallLimitMiddleware`, `ChatDeepSeek` e `recursion_limit` no `config` do `invoke`
+- [X] **T27.2** Criar `ai/prompts.py` com o system prompt do especialista em finanças pessoais
   - Papel: consultor financeiro pessoal, resposta em **português brasileiro**, linguagem simples
   - Regras: usar **somente** números vindos das tools; nunca inventar valores; declarar explicitamente quando não houver dados suficientes
   - Tom: construtivo e prático, sem julgamento moral sobre os gastos
   - Proibições: não dar recomendação de investimento específico, não prometer rentabilidade
-- [ ] **T27.3** Criar `ai/schemas.py` com o schema Pydantic `FinancialAnalysis`
+  - Inclui as faixas do `health_score` e a mensagem de tarefa `build_analysis_request(months)`
+- [X] **T27.3** Criar `ai/schemas.py` com o schema Pydantic `FinancialAnalysis`
   - `summary` (2–4 frases), `insights` (3–5 itens), `tips` (3–5 itens)
   - `health_score` (0–100) e `health_label` (`critical`/`attention`/`good`/`excellent`)
   - `period_start` e `period_end`
-- [ ] **T27.4** Criar `ai/agent.py` com a configuração do `ChatDeepSeek`
+  - Validadores garantem `period_start <= period_end` e coerência entre score e rótulo
+- [X] **T27.4** Criar `ai/agent.py` com a configuração do `ChatDeepSeek`
   - Modelo e chave vindos das settings; `temperature` baixa para reduzir variação
   - `timeout` e política de retry alinhados a `AI_AGENT_TIMEOUT_SECONDS`
-- [ ] **T27.5** Implementar `build_finance_agent(user)`
+- [X] **T27.5** Implementar `build_finance_agent(user)`
   - Junta modelo + `build_tools(user)` + system prompt + saída estruturada `FinancialAnalysis`
   - Aplicar o teto de iterações (`AI_AGENT_MAX_ITERATIONS`)
-- [ ] **T27.6** Criar `ai/services.py` com `run_analysis_for_user(user)`
+  - Teto aplicado em duas camadas: `ModelCallLimitMiddleware(run_limit=...)` e `recursion_limit` do grafo
+- [X] **T27.6** Criar `ai/services.py` com `run_analysis_for_user(user)`
   - Verificar `AI_ANALYSIS_ENABLED` e presença da chave antes de executar
   - Invocar o agente, medir duração, capturar tokens e nº de iterações
   - Persistir `AIAnalysis` com `status='success'` e os campos da saída estruturada
-- [ ] **T27.7** Implementar o tratamento de erros do serviço
+- [X] **T27.7** Implementar o tratamento de erros do serviço
   - `try/except` abrangente: rede, timeout, credencial inválida, limite de requisições, saída fora do schema
   - Persistir `AIAnalysis` com `status='error'` e `error_message`; registrar no logger da app
   - Nunca propagar exceção para a view a ponto de quebrar o dashboard
-- [ ] **T27.8** Implementar o controle de intervalo mínimo entre gerações
+- [X] **T27.8** Implementar o controle de intervalo mínimo entre gerações
   - Função utilitária que verifica a última análise do usuário contra `AI_ANALYSIS_MIN_INTERVAL_MINUTES`
-- [ ] **T27.9** Garantir que a chave de API nunca apareça em log, mensagem de erro ou template
+  - `cooldown_remaining_minutes(user)` e `can_generate_analysis(user)`; execuções com erro também contam
+- [X] **T27.9** Garantir que a chave de API nunca apareça em log, mensagem de erro ou template
+  - `error_message` usa apenas textos fixos; o log passa por `_redact()`, que remove a chave
 
 #### T28. Interface: dashboard, histórico e geração sob demanda
 
