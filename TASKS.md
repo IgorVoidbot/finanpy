@@ -621,17 +621,19 @@
 
 #### T29. Geração em lote (management command)
 
-- [ ] **T29.1** Criar `ai/management/commands/run_ai_analysis.py`
+- [X] **T29.1** Criar `ai/management/commands/run_ai_analysis.py`
   - Sem argumentos: gera uma análise para **cada usuário ativo**, usando apenas os dados de cada um
-- [ ] **T29.2** Adicionar as opções do comando
+- [X] **T29.2** Adicionar as opções do comando
   - `--user <email>` para um único usuário
   - `--skip-empty` para pular usuários sem transações
   - `--dry-run` para listar quem seria processado sem chamar a API
-- [ ] **T29.3** Isolar falhas por usuário
+  - Com a IA desligada o comando aborta com `CommandError`, exceto em `--dry-run`, que não chama a API
+- [X] **T29.3** Isolar falhas por usuário
   - Erro em um usuário não interrompe os demais; cada falha vira um `AIAnalysis` com `status='error'`
-- [ ] **T29.4** Exibir resumo ao final
+- [X] **T29.4** Exibir resumo ao final
   - Total processado, sucessos, falhas e tempo total, com `self.stdout.write` colorido
-- [ ] **T29.5** Documentar o comando no README (execução local e via `docker compose exec`)
+- [X] **T29.5** Documentar o comando no README (execução local e via `docker compose exec`)
+  - A seção completa "Agente de IA" fica na T31.1; aqui entrou apenas o comando
 
 #### T30. Testes
 

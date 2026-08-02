@@ -122,6 +122,10 @@ docker compose exec web python manage.py migrate
 docker compose exec web python manage.py createsuperuser
 docker compose exec web python manage.py shell
 
+# Gerar as análises de IA em lote (exige DEEPSEEK_API_KEY no .env)
+docker compose exec web python manage.py run_ai_analysis
+docker compose exec web python manage.py run_ai_analysis --dry-run
+
 # Rodar os testes dentro do container
 docker compose exec web pytest
 
@@ -171,6 +175,30 @@ python manage.py test accounts
 python manage.py test categories
 python manage.py test transactions
 ```
+
+### Geração em lote das análises de IA
+
+O comando `run_ai_analysis` gera uma análise para **cada usuário ativo**, usando
+somente os dados de cada um. Requer `DEEPSEEK_API_KEY` configurada — cada
+análise consome tokens da API.
+
+```bash
+# Uma análise para cada usuário ativo
+python manage.py run_ai_analysis
+
+# Apenas um usuário
+python manage.py run_ai_analysis --user maria@example.com
+
+# Pular usuários que ainda não têm transações
+python manage.py run_ai_analysis --skip-empty
+
+# Listar quem seria processado, sem chamar a API
+python manage.py run_ai_analysis --dry-run
+```
+
+Uma falha em um usuário não interrompe os demais: o erro é gravado como uma
+análise com situação `error` e o comando segue para o próximo. Ao final é
+exibido o resumo com total processado, sucessos, falhas e tempo total.
 
 ---
 
