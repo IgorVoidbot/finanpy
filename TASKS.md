@@ -1,6 +1,8 @@
 ## Lista de Tarefas (Sprints)
 
 > Legenda: `[ ]` = pendente · `[X]` = concluído
+>
+> **Nota de numeração (02/08/2026):** a Sprint 8 passou a ser o Agente de IA. As antigas Sprints 8 (Testes) e 9 (Docker), já concluídas, foram renumeradas para **9** e **10**. Os identificadores de tarefa (`T21`–`T23`) foram mantidos como estavam para não invalidar as referências do histórico de commits e da documentação — por isso a Sprint 8 usa `T24`–`T31`.
 
 ---
 
@@ -451,7 +453,211 @@
 
 ---
 
-### Sprint 8 — Testes (Sprint Final)
+### Sprint 8 — Agente de IA de Análise Financeira
+
+> Referência: **RF09** e seção **8.5** do `PRD.md`. Toda a lógica fica na app `ai/`.
+> Regra transversal: **nenhuma tool do agente pode acessar dados de um usuário diferente do que foi fixado no servidor.**
+> Antes de escrever código do LangChain, consultar a documentação vigente via MCP context7 — não assumir APIs de memória.
+
+#### T24. Setup da app `ai` e dependências
+
+- [ ] **T24.1** Adicionar dependências ao `requirements.txt`
+  - `langchain` (1.0+), `langchain-deepseek`, `python-dotenv`
+  - Gravar o arquivo em **UTF-8 sem BOM** (UTF-16 quebra o `pip install` no container)
+- [ ] **T24.2** Criar a app: `python manage.py startapp ai`
+  - Registrar `'ai'` em `INSTALLED_APPS` no `core/settings.py`
+- [ ] **T24.3** Configurar carregamento de variáveis de ambiente
+  - `load_dotenv()` no topo de `core/settings.py`
+  - Criar `.env.example` com as chaves esperadas (sem valores reais)
+  - Confirmar que `.env` já está no `.gitignore`
+- [ ] **T24.4** Adicionar as settings do agente em `core/settings.py`
+  - `DEEPSEEK_API_KEY` (do ambiente, default vazio)
+  - `DEEPSEEK_MODEL` (default `'deepseek-chat'`)
+  - `AI_ANALYSIS_ENABLED` (default `True`, forçado a `False` se não houver chave)
+  - `AI_ANALYSIS_MIN_INTERVAL_MINUTES` (default `15`)
+  - `AI_AGENT_TIMEOUT_SECONDS` (default `60`)
+  - `AI_AGENT_MAX_ITERATIONS` (default `10`)
+  - `AI_ANALYSIS_MONTHS_WINDOW` (default `6`)
+- [ ] **T24.5** Repassar a chave ao container
+  - Adicionar `env_file: .env` ao serviço `web` no `docker-compose.yml`
+  - Documentar que sem `.env` a funcionalidade sobe desligada
+- [ ] **T24.6** Validar conexão mínima com a API DeepSeek
+  - Chamada única de teste via `python manage.py shell`, confirmando credencial e nome do modelo
+
+#### T25. Model `AIAnalysis` e persistência
+
+- [ ] **T25.1** Criar o model `AIAnalysis` em `ai/models.py`
+  - `user = ForeignKey(User, on_delete=CASCADE, related_name='ai_analyses')`
+  - `status = CharField(max_length=10, choices=STATUS_CHOICES)` — `success`, `error`
+  - `summary = TextField(blank=True)`
+  - `insights = JSONField(default=list, blank=True)`
+  - `tips = JSONField(default=list, blank=True)`
+  - `health_score = PositiveSmallIntegerField(null=True, blank=True)`
+  - `health_label = CharField(max_length=20, choices=HEALTH_LABEL_CHOICES, blank=True)`
+  - `period_start` / `period_end` = `DateField(null=True, blank=True)`
+  - `model_name = CharField(max_length=50, blank=True)`
+  - `prompt_tokens`, `completion_tokens`, `total_tokens` = `PositiveIntegerField(default=0)`
+  - `duration_ms = PositiveIntegerField(default=0)`
+  - `iterations = PositiveSmallIntegerField(default=0)`
+  - `error_message = TextField(blank=True)`
+  - `created_at` (auto_now_add) e `updated_at` (auto_now)
+- [ ] **T25.2** Configurar `class Meta`
+  - `ordering = ['-created_at']`
+  - `indexes = [models.Index(fields=['user', '-created_at'])]`
+  - `verbose_name = 'análise de IA'` e `verbose_name_plural = 'análises de IA'`
+- [ ] **T25.3** Implementar `__str__` e helpers de consulta
+  - Manager ou classmethod `latest_success_for(user)` retornando a última análise com `status='success'`
+  - Property `health_color_class` mapeando a faixa do score para a classe Tailwind (ver 9.10 do PRD)
+- [ ] **T25.4** Registrar no admin com `list_display`, `list_filter` e `readonly_fields`
+- [ ] **T25.5** Executar `makemigrations ai` e `migrate`
+
+#### T26. Tools de acesso ao banco de dados
+
+- [ ] **T26.1** Criar `ai/tools.py` com a factory `build_tools(user)`
+  - O `user` é fixado por closure/`partial`; **a assinatura exposta ao modelo nunca recebe `user_id`**
+  - Todas as tools são somente-leitura e usam exclusivamente o ORM do Django
+- [ ] **T26.2** Tool `get_financial_summary`
+  - Saldo total das contas, entradas/saídas/balanço do mês corrente, nº de contas e de transações
+- [ ] **T26.3** Tool `get_accounts_overview`
+  - Lista de contas do usuário: nome, tipo (rótulo em PT-BR), saldo inicial e saldo atual
+- [ ] **T26.4** Tool `get_expenses_by_category`
+  - Parâmetros: `months` (default da setting, teto de 24)
+  - Agrupamento por categoria com total e percentual sobre as saídas do período
+- [ ] **T26.5** Tool `get_income_by_category`
+  - Mesma estrutura da anterior, para entradas
+- [ ] **T26.6** Tool `get_monthly_totals`
+  - Série dos últimos N meses com entradas, saídas e balanço por mês
+- [ ] **T26.7** Tool `get_recent_transactions`
+  - Parâmetros: `limit` (default 20, teto 50); retorna data, descrição, categoria, conta, tipo e valor
+- [ ] **T26.8** Tool `get_largest_expenses`
+  - Maiores saídas do período, com teto de itens
+- [ ] **T26.9** Padronizar serialização dos retornos
+  - `Decimal` convertido para `float`/`str` antes de devolver ao modelo
+  - Datas em ISO 8601; nenhum objeto Django cru no retorno
+  - Validar e limitar todos os parâmetros vindos do modelo
+- [ ] **T26.10** Escrever docstrings descritivas em cada tool
+  - São elas que o modelo lê para decidir quando chamar cada tool — devem explicar o retorno e a unidade dos valores
+
+#### T27. Agente LangChain 1.0 + DeepSeek
+
+- [ ] **T27.1** Consultar a documentação atual do LangChain 1.0 via MCP context7 **antes de codar**
+  - Tópicos: construção de agente, definição de tools, saída estruturada, configuração de modelo e limites de iteração
+  - Registrar no código as APIs efetivamente usadas (evita divergência com versões antigas)
+- [ ] **T27.2** Criar `ai/prompts.py` com o system prompt do especialista em finanças pessoais
+  - Papel: consultor financeiro pessoal, resposta em **português brasileiro**, linguagem simples
+  - Regras: usar **somente** números vindos das tools; nunca inventar valores; declarar explicitamente quando não houver dados suficientes
+  - Tom: construtivo e prático, sem julgamento moral sobre os gastos
+  - Proibições: não dar recomendação de investimento específico, não prometer rentabilidade
+- [ ] **T27.3** Criar `ai/schemas.py` com o schema Pydantic `FinancialAnalysis`
+  - `summary` (2–4 frases), `insights` (3–5 itens), `tips` (3–5 itens)
+  - `health_score` (0–100) e `health_label` (`critical`/`attention`/`good`/`excellent`)
+  - `period_start` e `period_end`
+- [ ] **T27.4** Criar `ai/agent.py` com a configuração do `ChatDeepSeek`
+  - Modelo e chave vindos das settings; `temperature` baixa para reduzir variação
+  - `timeout` e política de retry alinhados a `AI_AGENT_TIMEOUT_SECONDS`
+- [ ] **T27.5** Implementar `build_finance_agent(user)`
+  - Junta modelo + `build_tools(user)` + system prompt + saída estruturada `FinancialAnalysis`
+  - Aplicar o teto de iterações (`AI_AGENT_MAX_ITERATIONS`)
+- [ ] **T27.6** Criar `ai/services.py` com `run_analysis_for_user(user)`
+  - Verificar `AI_ANALYSIS_ENABLED` e presença da chave antes de executar
+  - Invocar o agente, medir duração, capturar tokens e nº de iterações
+  - Persistir `AIAnalysis` com `status='success'` e os campos da saída estruturada
+- [ ] **T27.7** Implementar o tratamento de erros do serviço
+  - `try/except` abrangente: rede, timeout, credencial inválida, limite de requisições, saída fora do schema
+  - Persistir `AIAnalysis` com `status='error'` e `error_message`; registrar no logger da app
+  - Nunca propagar exceção para a view a ponto de quebrar o dashboard
+- [ ] **T27.8** Implementar o controle de intervalo mínimo entre gerações
+  - Função utilitária que verifica a última análise do usuário contra `AI_ANALYSIS_MIN_INTERVAL_MINUTES`
+- [ ] **T27.9** Garantir que a chave de API nunca apareça em log, mensagem de erro ou template
+
+#### T28. Interface: dashboard, histórico e geração sob demanda
+
+- [ ] **T28.1** Criar `templates/components/ai_insight_card.html`
+  - Card com borda superior violet, título "Análise Inteligente" com ícone SVG inline
+  - Indicador de saúde (score + badge colorido por faixa), resumo, lista de insights e de dicas
+  - Data de geração formatada e link para o histórico
+  - Seguir o snippet da seção 9.10 do PRD
+- [ ] **T28.2** Incluir a última análise no contexto da `DashboardView` (`core/views.py`)
+  - `latest_ai_analysis` = última análise com `status='success'` do `request.user`
+  - Consulta protegida por `try/except` para não derrubar o dashboard
+- [ ] **T28.3** Implementar os estados alternativos do card
+  - Vazio: usuário sem nenhuma análise → chamada para gerar a primeira
+  - Erro: última execução falhou → mensagem amigável e botão para tentar de novo
+  - Desligado (`AI_ANALYSIS_ENABLED=False`): card não é renderizado
+- [ ] **T28.4** Criar `GenerateAnalysisView` (POST) em `ai/views.py`
+  - `LoginRequiredMixin`; aceitar apenas POST com `{% csrf_token %}`
+  - Bloquear se o intervalo mínimo não foi respeitado (mensagem de alerta com o tempo restante)
+  - Chamar `run_analysis_for_user(request.user)` e redirecionar ao dashboard com `messages`
+- [ ] **T28.5** Adicionar estado de carregamento no botão (JavaScript vanilla)
+  - Desabilitar o botão e exibir spinner/texto "Analisando..." no submit, evitando duplo envio
+- [ ] **T28.6** Criar `AnalysisListView` (histórico)
+  - `LoginRequiredMixin` + `ListView`, `get_queryset()` filtrando por `user=self.request.user`
+  - Paginação de 10 por página
+- [ ] **T28.7** Criar `AnalysisDetailView`
+  - `LoginRequiredMixin` + `DetailView`, queryset filtrado por usuário (acesso a análise de outro → 404)
+- [ ] **T28.8** Criar `templates/ai/analysis_list.html` e `templates/ai/analysis_detail.html`
+  - Estender `base_app.html` e seguir o Design System
+  - Estado vazio amigável na listagem
+- [ ] **T28.9** Criar `ai/urls.py` com `app_name = 'ai'` e incluir em `core/urls.py`
+  - `analises/` → histórico, `analises/<pk>/` → detalhe, `analises/gerar/` → geração (POST)
+- [ ] **T28.10** Adicionar "Análises" na sidebar
+  - Ícone SVG inline, estado ativo via filtro `active_link`
+- [ ] **T28.11** Aplicar as cores do indicador de saúde conforme a tabela da seção 9.10 do PRD
+
+#### T29. Geração em lote (management command)
+
+- [ ] **T29.1** Criar `ai/management/commands/run_ai_analysis.py`
+  - Sem argumentos: gera uma análise para **cada usuário ativo**, usando apenas os dados de cada um
+- [ ] **T29.2** Adicionar as opções do comando
+  - `--user <email>` para um único usuário
+  - `--skip-empty` para pular usuários sem transações
+  - `--dry-run` para listar quem seria processado sem chamar a API
+- [ ] **T29.3** Isolar falhas por usuário
+  - Erro em um usuário não interrompe os demais; cada falha vira um `AIAnalysis` com `status='error'`
+- [ ] **T29.4** Exibir resumo ao final
+  - Total processado, sucessos, falhas e tempo total, com `self.stdout.write` colorido
+- [ ] **T29.5** Documentar o comando no README (execução local e via `docker compose exec`)
+
+#### T30. Testes
+
+- [ ] **T30.1** Criar dublê do modelo de IA em `conftest.py`
+  - Fake/stub que devolve uma `FinancialAnalysis` fixa — **nenhum teste chama a API real**
+  - Fixture de usuário com transações em categorias variadas
+- [ ] **T30.2** Testes das tools: valores corretos
+  - Somatórios, percentuais e agrupamentos conferem com os dados criados na fixture
+- [ ] **T30.3** Testes das tools: **isolamento entre usuários** (bloqueante)
+  - Tools construídas para o usuário A nunca retornam dados do usuário B
+  - Nenhuma tool aceita parâmetro que permita trocar de usuário
+- [ ] **T30.4** Testes do serviço
+  - Sucesso: cria `AIAnalysis` com `status='success'` e campos preenchidos
+  - Falha simulada na API: cria `AIAnalysis` com `status='error'` e mensagem, sem levantar exceção
+  - Feature flag desligada: não chama o agente
+- [ ] **T30.5** Testes do dashboard
+  - Card exibe a última análise bem-sucedida do próprio usuário
+  - Usuário sem análises vê o estado vazio
+  - Análise de outro usuário nunca aparece
+- [ ] **T30.6** Testes das views de histórico
+  - Listagem só traz análises do usuário logado
+  - Detalhe de análise de outro usuário retorna 404
+  - Rotas exigem login
+- [ ] **T30.7** Teste do intervalo mínimo entre gerações
+  - Segunda solicitação dentro da janela é bloqueada com mensagem, sem chamar o agente
+- [ ] **T30.8** Teste do management command
+  - Gera uma análise por usuário ativo; falha de um usuário não interrompe os demais
+- [ ] **T30.9** Rodar a suíte completa e garantir que os testes anteriores continuam passando
+
+#### T31. Documentação
+
+- [ ] **T31.1** Adicionar seção "Agente de IA" no `README.md`
+  - Como obter e configurar `DEEPSEEK_API_KEY`, variáveis disponíveis, comandos de geração
+  - Aviso de custo: cada análise consome tokens da API
+- [ ] **T31.2** Versionar o `.env.example` com todas as chaves esperadas
+- [ ] **T31.3** Atualizar `CLAUDE.md` com a app `ai` (domínio, convenções e regra de isolamento por usuário)
+- [ ] **T31.4** Atualizar `relatorio.md` com a nova app, o model `AIAnalysis` e o fluxo do agente
+
+---
+
+### Sprint 9 — Testes
 
 #### [X] T21. Setup de Testes
 
@@ -472,7 +678,7 @@
 
 ---
 
-### [X] Sprint 9 — Docker (Sprint Final)
+### [X] Sprint 10 — Docker
 #### [X] T23. Dockerização
 
 - [X] **T23.1** Criar `Dockerfile` com Python 3.12 + pip install de requirements
