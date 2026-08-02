@@ -1,9 +1,10 @@
 # PRD — Finanpy: Sistema de Gestão de Finanças Pessoais
 
-> **Versão:** 1.0  
-> **Data:** 05/04/2026  
+> **Versão:** 1.1  
+> **Data:** 02/08/2026 (v1.0 em 05/04/2026)  
 > **Autor:** Igor  
-> **Status:** Draft
+> **Status:** Draft  
+> **Alterações da v1.1:** adição do Agente de IA de análise financeira (RF09), construído com LangChain 1.0 + DeepSeek
 
 ---
 
@@ -71,6 +72,7 @@ Oferecer uma ferramenta simples, funcional e visualmente agradável para que pes
 | O4 | Registrar transações de entrada e saída (CRUD) | Transações vinculadas a conta + categoria |
 | O5 | Exibir dashboard com resumo financeiro | Dashboard com saldo, totais de entrada/saída |
 | O6 | Oferecer landing page pública | Página de apresentação com acesso a cadastro/login |
+| O7 | Entregar insights e dicas financeiras geradas por IA | Última análise do agente visível no dashboard, gerada só com dados do próprio usuário |
 
 ---
 
@@ -118,6 +120,52 @@ Oferecer uma ferramenta simples, funcional e visualmente agradável para que pes
 - Total de entradas e saídas do mês corrente.
 - Lista das últimas transações.
 - Resumo por categoria (quanto foi gasto/recebido por categoria no mês).
+- **Card da última análise do agente de IA** (ver RF09).
+
+### RF09 — Agente de IA de Análise Financeira
+
+Um agente de IA especializado em finanças pessoais analisa os dados do usuário (contas, categorias, transações) e produz um diagnóstico com insights e dicas práticas. Construído com **LangChain 1.0**, usando a **API da DeepSeek** como provedor de modelo. Toda a lógica vive na app `ai/`.
+
+#### RF09.1 — Geração da análise
+- O agente recebe **um usuário por execução** e trabalha exclusivamente com os dados desse usuário.
+- O agente decide quais dados buscar chamando **tools de leitura do banco relacional** (ver 8.5).
+- A análise é gerada em **português brasileiro**, em linguagem simples, sem jargão financeiro.
+- Formas de disparo:
+  1. **Sob demanda** — botão "Gerar nova análise" no dashboard (usuário logado gera a própria análise).
+  2. **Em lote** — management command `python manage.py run_ai_analysis`, que percorre todos os usuários ativos e gera uma análise individual para cada um.
+
+#### RF09.2 — Conteúdo da análise
+Cada análise contém:
+- **Resumo** (`summary`) — parágrafo curto com o diagnóstico geral do período.
+- **Insights** (`insights`) — lista de observações objetivas extraídas dos dados (ex.: "Alimentação consumiu 38% das saídas do mês, acima dos 25% do mês anterior").
+- **Dicas** (`tips`) — lista de recomendações acionáveis (ex.: "Estabeleça um teto de R$ 800 para Alimentação no próximo mês").
+- **Indicador de saúde financeira** (`health_score`) — nota de 0 a 100 com um rótulo (`critical`, `attention`, `good`, `excellent`).
+- **Período analisado** (`period_start`, `period_end`).
+
+#### RF09.3 — Persistência
+- Toda análise é gravada na tabela `ai_analysis` (model `AIAnalysis`), incluindo as que falharem (com `status='error'` e a mensagem de erro).
+- O histórico é preservado — análises antigas **não** são sobrescritas.
+- Metadados de execução são gravados junto: modelo usado, tokens consumidos, duração e número de iterações do agente.
+
+#### RF09.4 — Exibição
+- O dashboard exibe a **última análise bem-sucedida** do usuário logado, em card destacado, com resumo, insights, dicas, indicador de saúde e data de geração.
+- Estado vazio: se o usuário nunca gerou uma análise, o card exibe uma chamada para gerar a primeira.
+- Estado sem dados: se o usuário não tem transações suficientes, a análise informa isso em vez de inventar conclusões.
+- Página de **histórico** (`/analises/`) lista todas as análises do usuário, com detalhe individual.
+
+#### RF09.5 — Isolamento por usuário (crítico)
+- As análises são **individuais e privadas**: nenhum usuário acessa a análise de outro.
+- As tools do agente recebem o `user_id` **fixado no servidor** no momento da construção do agente — o modelo de IA **nunca** informa de qual usuário quer os dados.
+- Nenhuma tool aceita SQL livre gerado pelo modelo. Todo acesso ao banco passa pelo ORM do Django, sempre com `filter(user=...)`.
+
+#### RF09.6 — Tratamento de falhas
+- Falha de rede, chave inválida, timeout ou estouro de limite de requisições **não** podem quebrar o dashboard: o card cai no estado vazio/erro e o restante da página continua funcional.
+- Erros são registrados na própria tabela de análises e no log da aplicação.
+- Se a chave da API não estiver configurada, a funcionalidade fica desligada de forma silenciosa (feature flag `AI_ANALYSIS_ENABLED`).
+
+#### RF09.7 — Limites de uso
+- Intervalo mínimo entre gerações sob demanda por usuário (padrão: 15 minutos), para conter custo de API e uso abusivo.
+- Timeout por execução (padrão: 60s) e teto de iterações do agente (padrão: 10).
 
 ### Flowchart — Fluxos de UX
 
@@ -143,6 +191,7 @@ flowchart TD
     L --> N[Categorias]
     L --> O[Transações]
     L --> P[Perfil]
+    L --> R[Análises de IA]
     L --> Q[Logout]
 
     M --> M1[Listar Contas]
@@ -165,6 +214,14 @@ flowchart TD
 
     P --> P1[Editar Nome / E-mail]
 
+    R --> R1[Histórico de Análises]
+    R1 --> R2[Detalhe da Análise]
+    I --> R3[Card da última análise no Dashboard]
+    R3 --> R4[Gerar nova análise]
+    R4 --> R5[Agente de IA consulta dados do usuário via tools]
+    R5 --> R6[Salva AIAnalysis no banco]
+    R6 --> I
+
     Q --> C
 ```
 
@@ -184,6 +241,12 @@ flowchart TD
 | RNF08 | **Banco de dados** | SQLite padrão do Django |
 | RNF09 | **Interface em PT-BR** | Toda informação ao usuário em português brasileiro |
 | RNF10 | **Class Based Views** | Usar CBVs sempre que possível |
+| RNF11 | **Segredos fora do repositório** | `DEEPSEEK_API_KEY` lida de variável de ambiente / `.env`; nunca versionada |
+| RNF12 | **Isolamento de dados na IA** | Tools do agente sempre filtram por um `user_id` fixado no servidor; sem SQL livre gerado pelo modelo |
+| RNF13 | **Degradação graciosa da IA** | Indisponibilidade da API DeepSeek não pode quebrar dashboard nem nenhum fluxo existente |
+| RNF14 | **Testes sem chamadas externas** | Suíte de testes nunca chama a API real — modelo e agente são substituídos por dublês |
+| RNF15 | **Custo previsível** | Intervalo mínimo entre análises por usuário, timeout e teto de iterações configuráveis |
+| RNF16 | **Documentação de API atual** | Implementação do agente deve seguir a documentação vigente do LangChain 1.0 (consultada via MCP context7), não conhecimento prévio |
 
 ---
 
@@ -201,12 +264,30 @@ flowchart TD
 | Servidor de dev | `manage.py runserver` |
 | Autenticação | `django.contrib.auth` (customizado para login via e-mail) |
 | Gerenciamento de pacotes | pip + requirements.txt |
+| Agente de IA | LangChain 1.0 (`langchain`, `langchain-core`) |
+| Provedor de LLM | DeepSeek via `langchain-deepseek` (`ChatDeepSeek`) |
+| Configuração de segredos | variáveis de ambiente + `python-dotenv` |
+| Containerização | Docker + Docker Compose |
 
 ### 8.2 Estrutura de Diretórios
 
 ```
 finanpy/
 ├── accounts/          # Contas bancárias do usuário
+├── ai/                # Agente de IA (LangChain 1.0 + DeepSeek)
+│   ├── models.py              # AIAnalysis
+│   ├── agent.py               # Construção do agente LangChain
+│   ├── tools.py               # Tools de leitura do banco (escopadas por usuário)
+│   ├── prompts.py             # System prompt do agente financeiro
+│   ├── schemas.py             # Schema Pydantic da saída estruturada
+│   ├── services.py            # Orquestração: executar agente e persistir análise
+│   ├── views.py               # Histórico, detalhe e geração sob demanda
+│   ├── urls.py                # analises/*
+│   ├── admin.py
+│   ├── apps.py
+│   ├── management/commands/
+│   │   └── run_ai_analysis.py # Geração em lote para todos os usuários
+│   └── migrations/
 ├── categories/        # Categorias de transações
 ├── core/              # Configurações globais (settings, urls, wsgi, asgi)
 ├── profiles/          # Perfil do usuário
@@ -219,12 +300,17 @@ finanpy/
 │   │   ├── sidebar.html
 │   │   ├── card.html
 │   │   ├── modal_confirm.html
+│   │   ├── ai_insight_card.html   # Card da última análise (dashboard)
 │   │   └── messages.html
+│   ├── ai/
+│   │   ├── analysis_list.html
+│   │   └── analysis_detail.html
 │   ├── landing.html
 │   └── dashboard.html
 ├── static/            # Arquivos estáticos globais
 │   ├── css/
 │   └── js/
+├── .env               # Segredos locais (fora do controle de versão)
 ├── db.sqlite3
 ├── manage.py
 └── requirements.txt
@@ -287,10 +373,31 @@ erDiagram
         datetime updated_at
     }
 
+    AI_ANALYSIS {
+        int id PK
+        int user_id FK
+        string status
+        text summary
+        json insights
+        json tips
+        int health_score
+        string health_label
+        date period_start
+        date period_end
+        string model_name
+        int total_tokens
+        int duration_ms
+        int iterations
+        text error_message
+        datetime created_at
+        datetime updated_at
+    }
+
     USER ||--|| PROFILE : "tem"
     USER ||--o{ ACCOUNT : "possui"
     USER ||--o{ CATEGORY : "cria"
     USER ||--o{ TRANSACTION : "registra"
+    USER ||--o{ AI_ANALYSIS : "recebe"
     ACCOUNT ||--o{ TRANSACTION : "pertence"
     CATEGORY ||--o{ TRANSACTION : "classifica"
 ```
@@ -331,6 +438,114 @@ erDiagram
 - `transaction_type`: CharField, choices (income, expense)
 - `date`: DateField
 - `created_at` / `updated_at`
+
+**AIAnalysis** (app `ai`)
+- `user`: ForeignKey → User, `related_name='ai_analyses'`, `on_delete=CASCADE`
+- `status`: CharField(10), choices (`success`, `error`) — registro é gravado nos dois casos
+- `summary`: TextField — diagnóstico geral em PT-BR
+- `insights`: JSONField, `default=list` — lista de strings
+- `tips`: JSONField, `default=list` — lista de strings
+- `health_score`: PositiveSmallIntegerField, null/blank — 0 a 100
+- `health_label`: CharField(20), choices (`critical`, `attention`, `good`, `excellent`), blank
+- `period_start` / `period_end`: DateField, null/blank — janela de dados analisada
+- `model_name`: CharField(50) — modelo DeepSeek usado na execução
+- `prompt_tokens` / `completion_tokens` / `total_tokens`: PositiveIntegerField, default 0
+- `duration_ms`: PositiveIntegerField, default 0
+- `iterations`: PositiveSmallIntegerField, default 0 — chamadas ao modelo no loop do agente
+- `error_message`: TextField, blank — preenchido quando `status='error'`
+- `created_at` / `updated_at`
+- `Meta`: `ordering = ['-created_at']`, índice em `['user', '-created_at']`, `verbose_name = 'análise de IA'`
+
+### 8.5 Arquitetura do Agente de IA
+
+#### 8.5.1 Módulos da app `ai/`
+
+| Módulo | Responsabilidade |
+|---|---|
+| `tools.py` | Tools LangChain de leitura do banco. Uma factory `build_tools(user)` devolve as tools já vinculadas ao usuário |
+| `prompts.py` | System prompt do especialista em finanças pessoais (PT-BR), com regras de tom, formato e proibição de inventar dados |
+| `schemas.py` | Schema Pydantic `FinancialAnalysis` usado como saída estruturada do agente |
+| `agent.py` | `build_finance_agent(user)` — monta `ChatDeepSeek` + tools + prompt + saída estruturada |
+| `services.py` | `run_analysis_for_user(user)` — executa o agente, mede tempo/tokens, persiste `AIAnalysis`, captura erros |
+| `views.py` | `AnalysisListView`, `AnalysisDetailView`, `GenerateAnalysisView` (POST) |
+| `management/commands/run_ai_analysis.py` | Geração em lote para todos os usuários ativos |
+
+#### 8.5.2 Tools disponíveis ao agente
+
+Todas somente-leitura, todas escopadas ao usuário fixado no servidor, todas retornando dados serializáveis (dict/list) já agregados:
+
+| Tool | Retorno |
+|---|---|
+| `get_financial_summary` | Saldo total, entradas/saídas do mês, balanço, nº de contas e de transações |
+| `get_accounts_overview` | Lista de contas com tipo, saldo inicial e saldo atual |
+| `get_expenses_by_category` | Gastos agrupados por categoria em um período, com valor e percentual |
+| `get_income_by_category` | Entradas agrupadas por categoria em um período |
+| `get_monthly_totals` | Série mensal de entradas, saídas e balanço dos últimos N meses |
+| `get_recent_transactions` | Últimas N transações (data, descrição, categoria, conta, tipo, valor) |
+| `get_largest_expenses` | Maiores saídas de um período |
+
+Regras de implementação das tools:
+- Assinatura exposta ao modelo **nunca** inclui `user_id`; o usuário vem por closure/`partial` na factory.
+- Parâmetros aceitos do modelo limitam-se a filtros inofensivos (período, quantidade, tipo), sempre validados e com teto.
+- Retornos limitados em volume (ex.: máximo de 50 transações) para conter o tamanho do contexto e o custo.
+
+#### 8.5.3 Fluxo de execução
+
+```mermaid
+sequenceDiagram
+    participant U as Usuário / Command
+    participant S as services.run_analysis_for_user
+    participant A as Agente LangChain
+    participant D as DeepSeek API
+    participant T as Tools (ORM Django)
+    participant DB as Banco de dados
+
+    U->>S: solicita análise (user)
+    S->>A: build_finance_agent(user) + invoke
+    A->>D: mensagens + definições das tools
+    D-->>A: pedido de chamada de tool
+    A->>T: executa tool (escopada ao user)
+    T->>DB: query ORM filtrada por user
+    DB-->>T: dados agregados
+    T-->>A: resultado da tool
+    A->>D: resultado da tool
+    D-->>A: saída estruturada final
+    A-->>S: FinancialAnalysis
+    S->>DB: grava AIAnalysis (success ou error)
+    S-->>U: análise persistida
+```
+
+#### 8.5.4 Saída estruturada
+
+O agente devolve um objeto validado pelo schema `FinancialAnalysis`:
+
+| Campo | Tipo | Regra |
+|---|---|---|
+| `summary` | str | 2 a 4 frases |
+| `insights` | list[str] | 3 a 5 itens |
+| `tips` | list[str] | 3 a 5 itens, acionáveis |
+| `health_score` | int | 0 a 100 |
+| `health_label` | enum | `critical`, `attention`, `good`, `excellent` |
+| `period_start` / `period_end` | date | janela efetivamente analisada |
+
+#### 8.5.5 Configurações (settings)
+
+| Variável | Padrão | Descrição |
+|---|---|---|
+| `DEEPSEEK_API_KEY` | vazio | Chave da API DeepSeek, lida do ambiente |
+| `DEEPSEEK_MODEL` | `deepseek-chat` | Identificador do modelo (V3/V4 conforme a versão contratada) |
+| `AI_ANALYSIS_ENABLED` | `True` | Feature flag; desligada automaticamente se não houver chave |
+| `AI_ANALYSIS_MIN_INTERVAL_MINUTES` | `15` | Intervalo mínimo entre gerações sob demanda por usuário |
+| `AI_AGENT_TIMEOUT_SECONDS` | `60` | Timeout de uma execução do agente |
+| `AI_AGENT_MAX_ITERATIONS` | `10` | Teto de iterações do loop do agente |
+| `AI_ANALYSIS_MONTHS_WINDOW` | `6` | Janela padrão de meses considerada na análise |
+
+#### 8.5.6 Decisões de arquitetura
+
+- **Execução síncrona no MVP.** A geração sob demanda ocorre dentro do request (POST), com estado de carregamento na interface. Fila assíncrona (Celery/RQ) fica como evolução futura — adotá-la agora violaria o RNF07 (simplicidade).
+- **Sem SQL livre.** Nenhum toolkit de SQL genérico é usado. Toda leitura passa por tools com queries fixas no ORM, o que elimina a classe de risco de um modelo consultar dados de outro usuário.
+- **A app `ai` não altera dados.** O agente apenas lê o domínio financeiro; a única escrita é a própria `AIAnalysis`.
+- **Documentação viva.** A API do LangChain 1.0 deve ser confirmada via MCP context7 durante a implementação (RNF16); nomes de funções não devem ser assumidos de memória.
 
 ---
 
@@ -567,6 +782,74 @@ erDiagram
 </div>
 ```
 
+### 9.10 Card de Análise de IA (dashboard)
+
+O card usa o accent secundário (violet) para se diferenciar dos cards financeiros, que usam emerald/rose.
+
+```html
+<!-- Card da última análise de IA -->
+<div class="bg-gray-900 border border-gray-700 rounded-xl p-6
+    border-t-2 border-t-violet-500">
+    <div class="flex items-start justify-between mb-4">
+        <div class="flex items-center gap-2">
+            <!-- ícone sparkles SVG -->
+            <h3 class="text-lg font-semibold text-gray-100">Análise Inteligente</h3>
+        </div>
+        <span class="text-xs text-gray-500">Gerada em 02/08/2026 às 14:32</span>
+    </div>
+
+    <!-- Indicador de saúde financeira -->
+    <div class="flex items-center gap-3 mb-4">
+        <span class="text-3xl font-bold text-emerald-400">78</span>
+        <span class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400
+            text-xs font-medium px-2 py-1 rounded-full">Boa</span>
+    </div>
+
+    <p class="text-sm text-gray-300 mb-4">Resumo do diagnóstico do período...</p>
+
+    <h4 class="text-sm font-medium text-gray-400 mb-2">Insights</h4>
+    <ul class="space-y-1 mb-4 text-sm text-gray-300 list-disc list-inside">
+        <li>Alimentação consumiu 38% das saídas do mês.</li>
+    </ul>
+
+    <h4 class="text-sm font-medium text-gray-400 mb-2">Dicas</h4>
+    <ul class="space-y-1 mb-4 text-sm text-gray-300 list-disc list-inside">
+        <li>Estabeleça um teto de R$ 800 para Alimentação.</li>
+    </ul>
+
+    <div class="flex items-center justify-between pt-4 border-t border-gray-700">
+        <a href="{% url 'ai:analysis_list' %}"
+            class="text-sm text-violet-400 hover:text-violet-300 transition-colors">
+            Ver histórico
+        </a>
+        <form method="post" action="{% url 'ai:generate' %}">
+            {% csrf_token %}
+            <button type="submit" class="bg-violet-500 hover:bg-violet-600 text-white
+                font-medium py-2 px-4 rounded-lg transition-colors duration-200">
+                Gerar nova análise
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Estado vazio -->
+<div class="bg-gray-900 border border-dashed border-gray-700 rounded-xl p-6 text-center">
+    <p class="text-sm text-gray-400 mb-4">
+        Você ainda não tem uma análise. Gere a primeira e receba insights sobre suas finanças.
+    </p>
+    <!-- botão "Gerar análise" -->
+</div>
+```
+
+**Cores do indicador de saúde:**
+
+| Rótulo | Faixa | Classe |
+|---|---|---|
+| Crítica | 0–39 | `text-rose-400` / `bg-rose-500/10` |
+| Atenção | 40–59 | `text-amber-400` / `bg-amber-500/10` |
+| Boa | 60–84 | `text-emerald-400` / `bg-emerald-500/10` |
+| Excelente | 85–100 | `text-violet-400` / `bg-violet-500/10` |
+
 ---
 
 ## 10. User Stories
@@ -732,6 +1015,52 @@ Critérios de aceite:
 - Botões "Cadastre-se" e "Entrar" visíveis.
 - Se já logado, redireciona ao dashboard.
 
+### Épico 7 — Agente de IA
+
+**US20 — Ver a última análise no dashboard**
+> Como usuário logado, quero ver no dashboard a análise mais recente das minhas finanças, com insights e dicas, para entender minha situação sem precisar interpretar os números sozinho.
+
+Critérios de aceite:
+- O card exibe resumo, insights, dicas, indicador de saúde e data de geração da **última análise bem-sucedida** do usuário logado.
+- Se o usuário nunca gerou uma análise, o card mostra o estado vazio com chamada para gerar a primeira.
+- O card nunca exibe análise de outro usuário.
+- Se a funcionalidade estiver desligada (`AI_ANALYSIS_ENABLED=False`), o card não aparece e o restante do dashboard segue normal.
+
+**US21 — Gerar uma nova análise sob demanda**
+> Como usuário logado, quero solicitar uma nova análise para atualizar o diagnóstico depois de registrar transações novas.
+
+Critérios de aceite:
+- Botão "Gerar nova análise" no card do dashboard, via POST com `{% csrf_token %}`.
+- Enquanto processa, a interface indica carregamento e impede duplo envio.
+- Ao concluir, redireciona ao dashboard com mensagem de sucesso e o card já atualizado.
+- Se a última geração foi há menos de `AI_ANALYSIS_MIN_INTERVAL_MINUTES`, exibe mensagem de alerta informando quando será possível gerar de novo.
+- Em caso de falha na API, exibe mensagem de erro amigável e o dashboard continua utilizável.
+
+**US22 — Consultar o histórico de análises**
+> Como usuário logado, quero ver as análises anteriores para acompanhar a evolução das minhas finanças ao longo do tempo.
+
+Critérios de aceite:
+- Página `/analises/` lista as análises do usuário logado em ordem decrescente de data, com paginação.
+- Cada item mostra data, indicador de saúde e trecho do resumo.
+- Detalhe individual exibe a análise completa.
+- Acesso ao detalhe de uma análise de outro usuário retorna 404.
+
+**US23 — Gerar análises para todos os usuários (operação)**
+> Como responsável pelo sistema, quero rodar um comando que gera a análise de todos os usuários, para manter o dashboard de cada um atualizado.
+
+Critérios de aceite:
+- `python manage.py run_ai_analysis` percorre todos os usuários ativos e gera uma análise por usuário, usando apenas os dados de cada um.
+- Opção `--user <email>` para gerar de um único usuário.
+- Falha em um usuário não interrompe a execução dos demais; erros são registrados.
+- Ao final, o comando reporta o total de sucessos e falhas.
+
+**US24 — Análise honesta com poucos dados**
+> Como usuário novo, quero que a análise diga que ainda não há dados suficientes em vez de inventar conclusões.
+
+Critérios de aceite:
+- Com nenhuma ou pouquíssimas transações, a análise declara a limitação explicitamente.
+- O agente não apresenta números que não vieram das tools.
+
 ---
 
 ## 11. Métricas de Sucesso
@@ -760,6 +1089,16 @@ Critérios de aceite:
 | Cobertura de código | (para sprints finais) | > 80% |
 | Conformidade PEP08 | Código passa em linters | 100% |
 
+### KPIs do Agente de IA
+
+| Métrica | Descrição | Meta |
+|---|---|---|
+| Taxa de sucesso da análise | Execuções com `status='success'` sobre o total | > 95% |
+| Tempo de geração | Duração de uma execução do agente | < 60s |
+| Vazamento entre usuários | Análises contendo dados de outro usuário | 0 (bloqueante) |
+| Fidelidade aos dados | Números citados na análise conferem com o banco | 100% em amostragem |
+| Custo por análise | Tokens consumidos por execução | Monitorado via `total_tokens` |
+
 ---
 
 ## 12. Riscos e Mitigações
@@ -773,6 +1112,12 @@ Critérios de aceite:
 | R5 | Login por e-mail conflita com libs de terceiros | Médio | Baixa | Usar `AbstractUser` com `USERNAME_FIELD = 'email'` desde o início |
 | R6 | Inconsistência de saldos | Alto | Média | Centralizar lógica de atualização de saldo em método do model ou signal |
 | R7 | Scope creep (adição de features fora do escopo) | Médio | Alta | Seguir estritamente o PRD; não implementar o que não for solicitado |
+| R8 | **Vazamento de dados entre usuários pelo agente** | Crítico | Média | `user_id` fixado no servidor por closure nas tools; proibição de SQL livre; teste automatizado dedicado ao isolamento |
+| R9 | **Alucinação de números pelo modelo** | Alto | Alta | Prompt exige usar somente valores retornados pelas tools; saída estruturada validada por Pydantic; instrução explícita para declarar falta de dados |
+| R10 | **Indisponibilidade ou custo da API DeepSeek** | Médio | Média | Feature flag, timeout, teto de iterações, intervalo mínimo entre gerações; falha isolada em try/except sem quebrar o dashboard |
+| R11 | **Vazamento da chave de API** | Alto | Média | `DEEPSEEK_API_KEY` só em variável de ambiente/`.env`; `.env` já ignorado no git; nunca logar a chave |
+| R12 | **Requisição longa travando o worker** | Médio | Média | Timeout por execução; geração em lote via management command fora do ciclo de request; fila assíncrona como evolução |
+| R13 | **API do LangChain 1.0 assumida de memória** | Médio | Alta | Implementação obrigada a consultar a documentação vigente via MCP context7 (RNF16) |
 
 
 > **Nota final:** Este PRD é um documento vivo. Deve ser atualizado conforme decisões evoluam durante as sprints. Priorizar entregas incrementais e evitar adicionar funcionalidades fora do escopo definido.

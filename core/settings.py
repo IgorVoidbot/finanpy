@@ -41,6 +41,7 @@ INSTALLED_APPS = [
 
     'core',
     'accounts',
+    'ai',
     'categories',
     'profiles',
     'transactions',

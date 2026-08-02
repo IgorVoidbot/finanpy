@@ -1,6 +1,6 @@
 # Relatório Completo do Projeto — Finanpy
 
-> Gerado em: 2026-05-18 · Atualizado em: 2026-08-02 (Sprints 8 e 9)
+> Gerado em: 2026-05-18 · Atualizado em: 2026-08-02 (Sprints de Testes e Docker concluídas; Sprint 8 — Agente de IA — planejada)
 
 ---
 
@@ -603,16 +603,64 @@ docker compose exec web pytest      # rodar os testes no container
 | Sprint 5 | Dashboard | Concluída |
 | Sprint 6 | Refinamentos e Responsividade | Concluída |
 | Sprint 7 | Polimento e Preparação para Produção | Concluída |
-| Sprint 8 | Testes | Concluída |
-| Sprint 9 | Docker | Concluída |
+| Sprint 8 | Agente de IA de Análise Financeira | **Planejada** |
+| Sprint 9 | Testes | Concluída |
+| Sprint 10 | Docker | Concluída |
 
-### Progresso geral: 100% concluído
+> **Renumeração (02/08/2026):** a Sprint 8 passou a ser o Agente de IA. As antigas Sprints 8 (Testes) e 9 (Docker) viraram 9 e 10. Os identificadores de tarefa foram mantidos: `T21`–`T22` (Testes), `T23` (Docker) e `T24`–`T31` (Agente de IA).
 
-Todas as tarefas do `TASKS.md` estão marcadas como concluídas.
+### Progresso geral
+
+O escopo original do produto (Sprints 1 a 7, mais Testes e Docker) está **100% entregue**. A Sprint 8 — Agente de IA — está planejada e ainda não implementada.
 
 ---
 
-## 15. Convenções do Projeto
+## 15. Próxima Entrega — Agente de IA (planejado)
+
+Funcionalidade especificada em **RF09** e na seção **8.5** do `PRD.md`, com as tarefas detalhadas na **Sprint 8** do `TASKS.md`. Nada abaixo está implementado ainda — esta seção descreve o que foi planejado.
+
+### Escopo
+
+Um agente de IA especialista em finanças pessoais analisa os dados de cada usuário (contas, categorias, transações) e produz um diagnóstico com insights e dicas práticas em português brasileiro. A última análise aparece em card no dashboard; o histórico fica em `/analises/`.
+
+### Stack prevista
+
+| Item | Escolha |
+|---|---|
+| Framework de agente | LangChain 1.0 (`langchain`, `langchain-core`) |
+| Provedor de LLM | DeepSeek via `langchain-deepseek` (`ChatDeepSeek`) |
+| Identificador do modelo | Setting `DEEPSEEK_MODEL` (default `deepseek-chat`) |
+| Segredos | Variável de ambiente / `.env` com `python-dotenv` |
+| App Django | `ai/` |
+
+### Componentes planejados
+
+| Módulo | Responsabilidade |
+|---|---|
+| `ai/models.py` | `AIAnalysis` — grava toda análise, inclusive as que falharem |
+| `ai/tools.py` | 7 tools somente-leitura, escopadas por usuário, via ORM |
+| `ai/prompts.py` | System prompt do consultor financeiro (PT-BR) |
+| `ai/schemas.py` | `FinancialAnalysis` (Pydantic) — saída estruturada |
+| `ai/agent.py` | `build_finance_agent(user)` |
+| `ai/services.py` | `run_analysis_for_user(user)` — executa, mede, persiste, trata erro |
+| `ai/views.py` | Histórico, detalhe e geração sob demanda (POST) |
+| `ai/management/commands/run_ai_analysis.py` | Geração em lote para todos os usuários ativos |
+
+### Decisões de arquitetura registradas
+
+- **Isolamento por usuário é a regra crítica.** O `user` é fixado no servidor por closure nas tools; a assinatura exposta ao modelo não contém identificador de usuário. Toolkits de SQL genérico são proibidos — todo acesso passa pelo ORM com `filter(user=...)`.
+- **Execução síncrona no MVP**, com estado de carregamento na interface. Fila assíncrona fica como evolução futura, para não violar o RNF07 (simplicidade).
+- **Degradação graciosa**: indisponibilidade da API, chave ausente ou feature flag desligada não podem quebrar o dashboard.
+- **Testes sem rede**: a suíte substitui o modelo por um dublê; nenhuma chamada real à API DeepSeek.
+- **Documentação viva**: a API do LangChain 1.0 deve ser confirmada via MCP context7 durante a implementação, não assumida de memória.
+
+### Estado atual no repositório
+
+A app `ai` foi criada com `startapp` e registrada em `INSTALLED_APPS`, ainda com os arquivos padrão do Django (sem models, views ou tools). O agente especialista que conduzirá a implementação está documentado em `agents/ai.md`.
+
+---
+
+## 16. Convenções do Projeto
 
 | Aspecto | Convenção |
 |---|---|
@@ -628,7 +676,7 @@ Todas as tarefas do `TASKS.md` estão marcadas como concluídas.
 
 ---
 
-## 16. Arquivos de Documentação
+## 17. Arquivos de Documentação
 
 | Arquivo | Conteúdo |
 |---|---|
@@ -636,4 +684,6 @@ Todas as tarefas do `TASKS.md` estão marcadas como concluídas.
 | `CLAUDE.md` | Guia de desenvolvimento para Claude Code: comandos, arquitetura, convenções, design system |
 | `TASKS.md` | Lista completa de tarefas por sprint com status de conclusão |
 | `PRD.md` | Product Requirements Document com requisitos do produto |
+| `agents/README.md` | Índice dos agentes de IA de desenvolvimento (backend, frontend, QA, IA) |
+| `agents/ai.md` | Agente especialista em LangChain 1.0 responsável pela app `ai/` |
 | `relatorio.md` | Este arquivo — relatório completo do projeto |
