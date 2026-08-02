@@ -80,7 +80,15 @@ Alternativa ao setup local — não requer Python nem virtualenv na máquina, ap
 
 **Pré-requisitos:** Docker Engine 24+ e Docker Compose v2.
 
-**1. Suba a aplicação**
+**1. (Opcional) Configure o `.env`**
+
+```bash
+cp .env.example .env   # e preencha DEEPSEEK_API_KEY
+```
+
+O `docker-compose.yml` injeta o `.env` no container quando ele existe. Sem o arquivo, a aplicação sobe normalmente com a análise por IA desligada.
+
+**2. Suba a aplicação**
 
 ```bash
 docker compose up --build
@@ -88,7 +96,7 @@ docker compose up --build
 
 O container aplica as migrações automaticamente na inicialização e sobe o servidor de desenvolvimento. Acesse `http://localhost:8000/`.
 
-**2. Crie um superusuário** (em outro terminal, com o container rodando)
+**3. Crie um superusuário** (em outro terminal, com o container rodando)
 
 ```bash
 docker compose exec web python manage.py createsuperuser

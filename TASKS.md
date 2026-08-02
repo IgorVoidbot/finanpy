@@ -461,16 +461,17 @@
 
 #### T24. Setup da app `ai` e dependências
 
-- [ ] **T24.1** Adicionar dependências ao `requirements.txt`
+- [X] **T24.1** Adicionar dependências ao `requirements.txt`
   - `langchain` (1.0+), `langchain-deepseek`, `python-dotenv`
   - Gravar o arquivo em **UTF-8 sem BOM** (UTF-16 quebra o `pip install` no container)
-- [ ] **T24.2** Criar a app: `python manage.py startapp ai`
+  - Instalado e fixado: `langchain==1.3.14`, `langchain-deepseek==1.1.0`, `python-dotenv==1.2.2`
+- [X] **T24.2** Criar a app: `python manage.py startapp ai`
   - Registrar `'ai'` em `INSTALLED_APPS` no `core/settings.py`
-- [ ] **T24.3** Configurar carregamento de variáveis de ambiente
+- [X] **T24.3** Configurar carregamento de variáveis de ambiente
   - `load_dotenv()` no topo de `core/settings.py`
   - Criar `.env.example` com as chaves esperadas (sem valores reais)
   - Confirmar que `.env` já está no `.gitignore`
-- [ ] **T24.4** Adicionar as settings do agente em `core/settings.py`
+- [X] **T24.4** Adicionar as settings do agente em `core/settings.py`
   - `DEEPSEEK_API_KEY` (do ambiente, default vazio)
   - `DEEPSEEK_MODEL` (default `'deepseek-chat'`)
   - `AI_ANALYSIS_ENABLED` (default `True`, forçado a `False` se não houver chave)
@@ -478,11 +479,12 @@
   - `AI_AGENT_TIMEOUT_SECONDS` (default `60`)
   - `AI_AGENT_MAX_ITERATIONS` (default `10`)
   - `AI_ANALYSIS_MONTHS_WINDOW` (default `6`)
-- [ ] **T24.5** Repassar a chave ao container
+- [X] **T24.5** Repassar a chave ao container
   - Adicionar `env_file: .env` ao serviço `web` no `docker-compose.yml`
   - Documentar que sem `.env` a funcionalidade sobe desligada
 - [ ] **T24.6** Validar conexão mínima com a API DeepSeek
   - Chamada única de teste via `python manage.py shell`, confirmando credencial e nome do modelo
+  - **Bloqueado:** depende de uma `DEEPSEEK_API_KEY` válida no `.env`
 
 #### T25. Model `AIAnalysis` e persistência
 
