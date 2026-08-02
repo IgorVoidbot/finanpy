@@ -74,6 +74,68 @@ Acesse `http://127.0.0.1:8000/` no navegador.
 
 ---
 
+## Executando com Docker
+
+Alternativa ao setup local — não requer Python nem virtualenv na máquina, apenas Docker.
+
+**Pré-requisitos:** Docker Engine 24+ e Docker Compose v2.
+
+**1. Suba a aplicação**
+
+```bash
+docker compose up --build
+```
+
+O container aplica as migrações automaticamente na inicialização e sobe o servidor de desenvolvimento. Acesse `http://localhost:8000/`.
+
+**2. Crie um superusuário** (em outro terminal, com o container rodando)
+
+```bash
+docker compose exec web python manage.py createsuperuser
+```
+
+### Comandos Docker úteis
+
+```bash
+# Subir em background
+docker compose up -d --build
+
+# Ver logs
+docker compose logs -f web
+
+# Parar os containers (o banco é preservado no volume)
+docker compose down
+
+# Parar e APAGAR o banco de dados
+docker compose down -v
+
+# Rodar comandos do manage.py dentro do container
+docker compose exec web python manage.py migrate
+docker compose exec web python manage.py createsuperuser
+docker compose exec web python manage.py shell
+
+# Rodar os testes dentro do container
+docker compose exec web pytest
+
+# Abrir um shell no container
+docker compose exec web sh
+
+# Reconstruir a imagem após alterar o requirements.txt
+docker compose build --no-cache
+```
+
+### Persistência do banco de dados
+
+O SQLite fica no volume nomeado `finanpy_db`, montado em `/app/data` dentro do container. O caminho do arquivo é definido pela variável de ambiente `DJANGO_DB_PATH` (`/app/data/db.sqlite3` no compose).
+
+Isso mantém o banco intacto entre `docker compose down` / `up` e entre rebuilds da imagem. Para apagar os dados, use `docker compose down -v`.
+
+Fora do Docker, `DJANGO_DB_PATH` não é definida e o Django usa `BASE_DIR / 'db.sqlite3'` como sempre — o setup local não muda.
+
+> O container roda `runserver`, adequado para desenvolvimento e avaliação. Para produção, troque por um servidor WSGI (Gunicorn/uWSGI), defina `DEBUG = False`, configure `ALLOWED_HOSTS` e sirva os estáticos por um servidor dedicado.
+
+---
+
 ## Comandos úteis
 
 ```bash
@@ -133,6 +195,8 @@ pyfinance/
 ├── static/                 # Arquivos estáticos (CSS, JS, imagens)
 ├── manage.py
 ├── requirements.txt
+├── Dockerfile              # Imagem da aplicação (Python 3.12 slim)
+├── docker-compose.yml      # Serviço web + volume de persistência do banco
 └── db.sqlite3              # Banco de dados SQLite (gerado após migrate)
 ```
 
@@ -148,6 +212,7 @@ Todas as variáveis abaixo estão em `core/settings.py`.
 | `DEBUG` | `True` | Modo debug. Defina `False` em produção. |
 | `ALLOWED_HOSTS` | `[]` | Lista de hosts permitidos. Em produção, adicione o domínio da aplicação. |
 | `DATABASES` | SQLite (`db.sqlite3`) | Configuração do banco de dados. Troque por PostgreSQL em produção. |
+| `DJANGO_DB_PATH` | não definida | Variável de ambiente com o caminho do arquivo SQLite. Se ausente, usa `BASE_DIR / 'db.sqlite3'`. Usada pelo Docker para apontar ao volume. |
 | `LANGUAGE_CODE` | `'pt-br'` | Idioma da interface de administração e mensagens do Django. |
 | `TIME_ZONE` | `'America/Sao_Paulo'` | Fuso horário usado em datas e horas. |
 | `USE_TZ` | `True` | Armazenar datas com timezone no banco. |

@@ -1,0 +1,14 @@
+services:
+  web:
+    build: .
+    container_name: finanpy
+    ports:
+      - '8000:8000'
+    environment:
+      DJANGO_DB_PATH: /app/data/db.sqlite3
+    volumes:
+      - finanpy_db:/app/data
+    restart: unless-stopped
+
+volumes:
+  finanpy_db:

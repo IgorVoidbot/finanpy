@@ -472,11 +472,11 @@
 
 ---
 
-### Sprint 9 — Docker (Sprint Final)
-#### T23. Dockerização
+### [X] Sprint 9 — Docker (Sprint Final)
+#### [X] T23. Dockerização
 
-- [ ] **T23.1** Criar `Dockerfile` com Python 3.12 + pip install de requirements
-- [ ] **T23.2** Criar `docker-compose.yml` com serviço web
-- [ ] **T23.3** Configurar volume para persistir db.sqlite3
-- [ ] **T23.4** Documentar no README os comandos Docker
-- [ ] **T23.5** Testar build e execução completa via Docker
+- [X] **T23.1** Criar `Dockerfile` com Python 3.12 + pip install de requirements
+- [X] **T23.2** Criar `docker-compose.yml` com serviço web
+- [X] **T23.3** Configurar volume para persistir db.sqlite3
+- [X] **T23.4** Documentar no README os comandos Docker
+- [X] **T23.5** Testar build e execução completa via Docker
