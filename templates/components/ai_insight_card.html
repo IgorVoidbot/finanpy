@@ -1,0 +1,108 @@
+{% comment %}
+Card da última análise de IA (seção 9.10 do PRD).
+
+Contexto esperado (ver ai.services.analysis_panel_context):
+  ai_analysis_enabled  — feature flag; sem ela o card não é renderizado
+  latest_ai_analysis   — última análise bem-sucedida (ou None)
+  last_ai_analysis     — última execução, de qualquer situação (ou None)
+  ai_cooldown_minutes  — minutos restantes do intervalo mínimo entre gerações
+{% endcomment %}
+
+{% if ai_analysis_enabled %}
+
+<div class="bg-gray-900 border border-gray-700 rounded-xl p-6 border-t-2 border-t-violet-500 mb-8">
+
+    <!-- Cabeçalho -->
+    <div class="flex items-start justify-between gap-4 mb-4">
+        <div class="flex items-center gap-2">
+            <svg class="w-5 h-5 text-violet-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+            </svg>
+            <h3 class="text-lg font-semibold text-gray-100">Análise Inteligente</h3>
+        </div>
+        {% if latest_ai_analysis %}
+            <span class="text-xs text-gray-500 text-right whitespace-nowrap">
+                Gerada em {{ latest_ai_analysis.created_at|date:"d/m/Y" }} às {{ latest_ai_analysis.created_at|date:"H:i" }}
+            </span>
+        {% endif %}
+    </div>
+
+    {% if latest_ai_analysis %}
+
+        {% if last_ai_analysis and not last_ai_analysis.is_success %}
+            <!-- A última tentativa falhou, mas ainda existe uma análise anterior válida -->
+            <div class="bg-rose-500/10 border border-rose-500/30 text-rose-300 text-sm rounded-lg px-4 py-3 mb-4">
+                A última tentativa de gerar uma análise falhou. Você está vendo o resultado anterior.
+            </div>
+        {% endif %}
+
+        <!-- Indicador de saúde financeira -->
+        <div class="flex items-center gap-3 mb-4">
+            <span class="text-3xl font-bold {{ latest_ai_analysis.health_text_class }}">
+                {{ latest_ai_analysis.health_score }}
+            </span>
+            <span class="{{ latest_ai_analysis.health_color_class }} border text-xs font-medium px-2 py-1 rounded-full">
+                {{ latest_ai_analysis.get_health_label_display }}
+            </span>
+            <span class="text-xs text-gray-500">
+                {{ latest_ai_analysis.period_start|date:"d/m/Y" }} a {{ latest_ai_analysis.period_end|date:"d/m/Y" }}
+            </span>
+        </div>
+
+        <p class="text-sm text-gray-300 mb-4">{{ latest_ai_analysis.summary }}</p>
+
+        {% if latest_ai_analysis.insights %}
+            <h4 class="text-sm font-medium text-gray-400 mb-2">Insights</h4>
+            <ul class="space-y-1 mb-4 text-sm text-gray-300 list-disc list-inside">
+                {% for insight in latest_ai_analysis.insights %}
+                    <li>{{ insight }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        {% if latest_ai_analysis.tips %}
+            <h4 class="text-sm font-medium text-gray-400 mb-2">Dicas</h4>
+            <ul class="space-y-1 mb-4 text-sm text-gray-300 list-disc list-inside">
+                {% for tip in latest_ai_analysis.tips %}
+                    <li>{{ tip }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+    {% elif last_ai_analysis %}
+
+        <!-- Estado de erro: nunca houve uma análise bem-sucedida -->
+        <div class="bg-rose-500/10 border border-rose-500/30 rounded-lg px-4 py-3 mb-4">
+            <p class="text-sm text-rose-300">
+                {{ last_ai_analysis.error_message|default:"Não foi possível gerar a análise." }}
+            </p>
+        </div>
+        <p class="text-sm text-gray-400 mb-4">
+            Nada foi perdido — é só tentar de novo. Se o erro continuar, verifique a configuração da IA.
+        </p>
+
+    {% else %}
+
+        <!-- Estado vazio -->
+        <p class="text-sm text-gray-400 mb-4">
+            Você ainda não tem uma análise. Gere a primeira e receba um diagnóstico das suas
+            finanças, com insights e dicas baseados nas suas transações.
+        </p>
+
+    {% endif %}
+
+    <!-- Rodapé -->
+    <div class="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-gray-700">
+        <a
+            href="{% url 'ai:analysis_list' %}"
+            class="text-sm text-violet-400 hover:text-violet-300 transition-colors duration-200"
+        >
+            Ver histórico
+        </a>
+        {% include 'components/ai_generate_form.html' %}
+    </div>
+
+</div>
+
+{% endif %}

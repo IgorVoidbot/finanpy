@@ -1,3 +1,4 @@
+import logging
 from datetime import date
 
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -6,7 +7,11 @@ from django.shortcuts import redirect
 from django.views.generic import TemplateView
 
 from accounts.models import Account
+from ai import services as ai_services
 from transactions.models import Transaction
+
+
+logger = logging.getLogger(__name__)
 
 
 class LandingView(TemplateView):
@@ -71,5 +76,14 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             'recent_transactions': recent_transactions,
             'expenses_by_category': expenses_by_category,
         })
+        context.update(self.get_ai_context())
 
         return context
+
+    def get_ai_context(self):
+        """AI analysis card data — a failure here must not take the page down."""
+        try:
+            return ai_services.analysis_panel_context(self.request.user)
+        except Exception:
+            logger.exception('Could not load the AI analysis card')
+            return {'ai_analysis_enabled': False}

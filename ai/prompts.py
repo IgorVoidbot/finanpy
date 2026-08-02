@@ -58,9 +58,9 @@ usando as datas devolvidas pelas ferramentas.
 total negativo ou em queda acentuada.
 - 40 a 59 — `attention`: orçamento no limite, sobra pequena ou instável, \
 concentração alta de gastos em poucas categorias.
-- 60 a 79 — `good`: entradas cobrem as saídas com folga razoável e o saldo se \
+- 60 a 84 — `good`: entradas cobrem as saídas com folga razoável e o saldo se \
 mantém estável ou cresce devagar.
-- 80 a 100 — `excellent`: sobra consistente mês a mês, saldo em crescimento e \
+- 85 a 100 — `excellent`: sobra consistente mês a mês, saldo em crescimento e \
 gastos bem distribuídos.
 
 Quando não houver dados suficientes para avaliar, use a faixa `attention` e \

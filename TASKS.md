@@ -580,37 +580,44 @@
 
 #### T28. Interface: dashboard, histórico e geração sob demanda
 
-- [ ] **T28.1** Criar `templates/components/ai_insight_card.html`
+- [X] **T28.1** Criar `templates/components/ai_insight_card.html`
   - Card com borda superior violet, título "Análise Inteligente" com ícone SVG inline
   - Indicador de saúde (score + badge colorido por faixa), resumo, lista de insights e de dicas
   - Data de geração formatada e link para o histórico
   - Seguir o snippet da seção 9.10 do PRD
-- [ ] **T28.2** Incluir a última análise no contexto da `DashboardView` (`core/views.py`)
+  - O botão de geração saiu para `templates/components/ai_generate_form.html`, reaproveitado pelo histórico
+- [X] **T28.2** Incluir a última análise no contexto da `DashboardView` (`core/views.py`)
   - `latest_ai_analysis` = última análise com `status='success'` do `request.user`
   - Consulta protegida por `try/except` para não derrubar o dashboard
-- [ ] **T28.3** Implementar os estados alternativos do card
+  - Contexto montado por `ai.services.analysis_panel_context(user)`, usado também pelo histórico
+- [X] **T28.3** Implementar os estados alternativos do card
   - Vazio: usuário sem nenhuma análise → chamada para gerar a primeira
   - Erro: última execução falhou → mensagem amigável e botão para tentar de novo
   - Desligado (`AI_ANALYSIS_ENABLED=False`): card não é renderizado
-- [ ] **T28.4** Criar `GenerateAnalysisView` (POST) em `ai/views.py`
+  - Quando a última execução falha mas existe uma análise anterior válida, o card mostra a anterior com um aviso
+- [X] **T28.4** Criar `GenerateAnalysisView` (POST) em `ai/views.py`
   - `LoginRequiredMixin`; aceitar apenas POST com `{% csrf_token %}`
   - Bloquear se o intervalo mínimo não foi respeitado (mensagem de alerta com o tempo restante)
   - Chamar `run_analysis_for_user(request.user)` e redirecionar ao dashboard com `messages`
-- [ ] **T28.5** Adicionar estado de carregamento no botão (JavaScript vanilla)
+  - Aceita `next` validado por `url_has_allowed_host_and_scheme` para voltar ao histórico quando o botão parte de lá
+- [X] **T28.5** Adicionar estado de carregamento no botão (JavaScript vanilla)
   - Desabilitar o botão e exibir spinner/texto "Analisando..." no submit, evitando duplo envio
-- [ ] **T28.6** Criar `AnalysisListView` (histórico)
+- [X] **T28.6** Criar `AnalysisListView` (histórico)
   - `LoginRequiredMixin` + `ListView`, `get_queryset()` filtrando por `user=self.request.user`
   - Paginação de 10 por página
-- [ ] **T28.7** Criar `AnalysisDetailView`
+- [X] **T28.7** Criar `AnalysisDetailView`
   - `LoginRequiredMixin` + `DetailView`, queryset filtrado por usuário (acesso a análise de outro → 404)
-- [ ] **T28.8** Criar `templates/ai/analysis_list.html` e `templates/ai/analysis_detail.html`
+- [X] **T28.8** Criar `templates/ai/analysis_list.html` e `templates/ai/analysis_detail.html`
   - Estender `base_app.html` e seguir o Design System
   - Estado vazio amigável na listagem
-- [ ] **T28.9** Criar `ai/urls.py` com `app_name = 'ai'` e incluir em `core/urls.py`
+- [X] **T28.9** Criar `ai/urls.py` com `app_name = 'ai'` e incluir em `core/urls.py`
   - `analises/` → histórico, `analises/<pk>/` → detalhe, `analises/gerar/` → geração (POST)
-- [ ] **T28.10** Adicionar "Análises" na sidebar
+- [X] **T28.10** Adicionar "Análises" na sidebar
   - Ícone SVG inline, estado ativo via filtro `active_link`
-- [ ] **T28.11** Aplicar as cores do indicador de saúde conforme a tabela da seção 9.10 do PRD
+  - Adicionado também ao drawer mobile em `base_app.html`
+- [X] **T28.11** Aplicar as cores do indicador de saúde conforme a tabela da seção 9.10 do PRD
+  - `health_color_class` (badge) e `health_text_class` (score), ambos mapeados pelo rótulo
+  - Faixas do prompt e do validador alinhadas à tabela: `good` 60–84 e `excellent` 85–100
 
 #### T29. Geração em lote (management command)
 

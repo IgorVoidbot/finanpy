@@ -24,6 +24,16 @@ HEALTH_COLOR_CLASSES = {
 
 DEFAULT_HEALTH_COLOR_CLASS = 'text-gray-400 bg-gray-500/10 border-gray-500/30'
 
+# Text colour alone, for the score number displayed next to the badge
+HEALTH_TEXT_CLASSES = {
+    'critical': 'text-rose-400',
+    'attention': 'text-amber-400',
+    'good': 'text-emerald-400',
+    'excellent': 'text-violet-400',
+}
+
+DEFAULT_HEALTH_TEXT_CLASS = 'text-gray-400'
+
 
 class AIAnalysisQuerySet(models.QuerySet):
     def for_user(self, user):
@@ -106,3 +116,8 @@ class AIAnalysis(models.Model):
     def health_color_class(self):
         """Tailwind classes for the health badge, by label."""
         return HEALTH_COLOR_CLASSES.get(self.health_label, DEFAULT_HEALTH_COLOR_CLASS)
+
+    @property
+    def health_text_class(self):
+        """Tailwind text colour for the health score, by label."""
+        return HEALTH_TEXT_CLASSES.get(self.health_label, DEFAULT_HEALTH_TEXT_CLASS)

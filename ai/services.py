@@ -61,26 +61,49 @@ def cooldown_remaining_minutes(user):
     Every run counts — including the ones that failed — because a failed run
     still spends an API call.
     """
-    interval = settings.AI_ANALYSIS_MIN_INTERVAL_MINUTES
-    if interval <= 0:
-        return 0
-
     last_created_at = (
         AIAnalysis.objects.for_user(user)
         .values_list('created_at', flat=True)
         .first()
     )
-    if last_created_at is None:
-        return 0
-
-    elapsed = (timezone.now() - last_created_at).total_seconds() / 60
-    return max(0, math.ceil(interval - elapsed))
+    return _remaining_minutes(last_created_at)
 
 
 def can_generate_analysis(user):
     """Returns `(allowed, remaining_minutes)` for the on-demand generation."""
     remaining = cooldown_remaining_minutes(user)
     return remaining == 0, remaining
+
+
+def analysis_panel_context(user):
+    """Context used by the dashboard card and by the history page.
+
+    `latest_ai_analysis` is the last successful analysis — what the card shows.
+    `last_ai_analysis` is the last run of any status, which is what tells the
+    template to fall into the error state.
+    """
+    if not is_enabled():
+        return {'ai_analysis_enabled': False}
+
+    analyses = AIAnalysis.objects.for_user(user)
+    last = analyses.first()
+    latest_success = last if last is not None and last.is_success else analyses.successful().first()
+
+    return {
+        'ai_analysis_enabled': True,
+        'latest_ai_analysis': latest_success,
+        'last_ai_analysis': last,
+        'ai_cooldown_minutes': _remaining_minutes(last.created_at if last else None),
+    }
+
+
+def _remaining_minutes(last_created_at):
+    interval = settings.AI_ANALYSIS_MIN_INTERVAL_MINUTES
+    if interval <= 0 or last_created_at is None:
+        return 0
+
+    elapsed = (timezone.now() - last_created_at).total_seconds() / 60
+    return max(0, math.ceil(interval - elapsed))
 
 
 def run_analysis_for_user(user):

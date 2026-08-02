@@ -45,8 +45,8 @@ class FinancialAnalysis(BaseModel):
     )
     health_label: HealthLabel = Field(
         description=(
-            'Score range: critical (0-39), attention (40-59), good (60-79), '
-            'excellent (80-100).'
+            'Score range: critical (0-39), attention (40-59), good (60-84), '
+            'excellent (85-100).'
         ),
     )
     period_start: date = Field(description='First day of the analysed window (ISO 8601).')
@@ -60,12 +60,15 @@ class FinancialAnalysis(BaseModel):
 
     @model_validator(mode='after')
     def check_score_matches_label(self):
-        """Keeps score and label coherent — the badge colour comes from the label."""
+        """Keeps score and label coherent — the badge colour comes from the label.
+
+        The ranges are the ones in section 9.10 of PRD.md.
+        """
         ranges = {
             'critical': (0, 39),
             'attention': (40, 59),
-            'good': (60, 79),
-            'excellent': (80, 100),
+            'good': (60, 84),
+            'excellent': (85, 100),
         }
         low, high = ranges[self.health_label]
         if not low <= self.health_score <= high:
