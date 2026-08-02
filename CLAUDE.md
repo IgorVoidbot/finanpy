@@ -24,6 +24,22 @@ python manage.py test
 python manage.py test users        # testes de um app específico
 ```
 
+## Fluxo de trabalho com Git
+
+`develop` é a branch de integração. `main` guarda apenas o que está estável.
+
+- **Toda branch nova sai de `develop`**, nunca da `main`
+- PRs de feature e de correção apontam para `develop`
+- `main` só recebe merge vindo de `develop`
+- Mesclar por **merge commit**, não squash — as mensagens de commit deste projeto registram decisões de arquitetura e o rastro de bugs, e squash achataria esse histórico
+
+```bash
+# Começando qualquer tarefa nova
+git checkout develop
+git pull
+git checkout -b <nome-da-branch>
+```
+
 ## Arquitetura
 
 Projeto Django full-stack chamado **Finanpy**. O módulo de configuração global é `core/` (settings, urls, wsgi, asgi). Cada domínio vive em sua própria app:
