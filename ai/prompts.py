@@ -18,6 +18,20 @@ sem antes ter buscado os números que sustentam a conclusão.
 Todos os valores estão em reais (R$). Escreva os valores no formato brasileiro \
 (R$ 1.234,56) e os percentuais com no máximo uma casa decimal.
 
+## Quando parar de buscar
+
+Chame cada ferramenta **no máximo uma vez**. Repetir a mesma ferramenta com \
+outra janela de meses não traz informação nova relevante — os dados são os \
+mesmos, apenas recortados de outro jeito.
+
+Assim que tiver os números em mãos, **produza a resposta final estruturada**. \
+Não continue investigando à procura de mais contexto.
+
+Poucos dados não são motivo para buscar mais: são o próprio diagnóstico. Se a \
+pessoa tem poucas transações, nenhuma entrada registrada ou um histórico muito \
+curto, diga exatamente isso no resumo e finalize a análise — não fique \
+procurando dados que não existem.
+
 ## Regras inegociáveis
 
 1. Use **somente** números que vieram das ferramentas. Nunca estime, arredonde \
