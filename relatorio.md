@@ -711,7 +711,7 @@ docker compose exec web python manage.py run_ai_analysis
 
 ### Progresso geral
 
-Todo o escopo previsto está **entregue**, incluindo a **T24.6** (conexão com a API DeepSeek validada em 02/08/2026). Uma execução completa do agente contra a API real — análise ponta a ponta — ainda não foi feita: até aqui o fluxo inteiro foi exercitado com dublê.
+Todo o escopo previsto está **entregue**. A conexão com a API DeepSeek foi validada em 02/08/2026 (T24.6) e a primeira análise real foi gerada com sucesso no mesmo dia, fechando a Sprint 8 sem pendências.
 
 ---
 
@@ -792,7 +792,20 @@ Confirmadas via MCP context7 contra a versão instalada e registradas no docstri
 
 Chamada mínima via `python manage.py shell` em 02/08/2026: credencial aceita, `finish_reason=stop`, 13 tokens consumidos. O identificador `deepseek-chat` é um alias — o modelo que respondeu foi `deepseek-v4-flash`. O campo `model_name` do `AIAnalysis` grava o valor configurado, não o que a API devolve.
 
-Uma execução completa do agente contra a API real (análise ponta a ponta) ainda não foi feita — até aqui, todo o fluxo foi exercitado com dublê.
+### Execução real ponta a ponta
+
+Primeira análise gerada contra a API real em 02/08/2026, pelo botão do dashboard:
+
+| Métrica | Valor | Limite configurado |
+|---|---|---|
+| Situação | `success` | — |
+| Iterações do agente | 3 | 10 (`AI_AGENT_MAX_ITERATIONS`) |
+| Tokens consumidos | 9.065 | — |
+| Duração | 10,5 s | 60 s (`AI_AGENT_TIMEOUT_SECONDS`) |
+
+O fluxo completo — agente escolhendo as tools, tools consultando o ORM filtrado por usuário, saída estruturada validada pelo schema e persistência — funcionou como especificado. As margens contra os tetos de iteração e de timeout ficaram largas.
+
+> Referência de custo: uma análise ficou em torno de 9 mil tokens. É o número a considerar ao dimensionar a geração em lote.
 
 ---
 
