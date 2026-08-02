@@ -637,31 +637,36 @@
 
 #### T30. Testes
 
-- [ ] **T30.1** Criar dublê do modelo de IA em `conftest.py`
+- [X] **T30.1** Criar dublê do modelo de IA em `conftest.py`
   - Fake/stub que devolve uma `FinancialAnalysis` fixa — **nenhum teste chama a API real**
   - Fixture de usuário com transações em categorias variadas
-- [ ] **T30.2** Testes das tools: valores corretos
+  - `FakeAgent` + fixtures `fake_agent`, `fake_analysis`, `ai_enabled`, `user_with_history` e `other_user_with_history`
+- [X] **T30.2** Testes das tools: valores corretos
   - Somatórios, percentuais e agrupamentos conferem com os dados criados na fixture
-- [ ] **T30.3** Testes das tools: **isolamento entre usuários** (bloqueante)
+  - Inclui os tetos de `months`/`limit` e o comportamento com usuário sem dados (`ai/test_tools.py`)
+- [X] **T30.3** Testes das tools: **isolamento entre usuários** (bloqueante)
   - Tools construídas para o usuário A nunca retornam dados do usuário B
   - Nenhuma tool aceita parâmetro que permita trocar de usuário
-- [ ] **T30.4** Testes do serviço
+- [X] **T30.4** Testes do serviço
   - Sucesso: cria `AIAnalysis` com `status='success'` e campos preenchidos
   - Falha simulada na API: cria `AIAnalysis` com `status='error'` e mensagem, sem levantar exceção
   - Feature flag desligada: não chama o agente
-- [ ] **T30.5** Testes do dashboard
+  - Também cobre metadados de execução, teto de iterações e a não-exposição da chave (`ai/test_services.py`)
+- [X] **T30.5** Testes do dashboard
   - Card exibe a última análise bem-sucedida do próprio usuário
   - Usuário sem análises vê o estado vazio
   - Análise de outro usuário nunca aparece
-- [ ] **T30.6** Testes das views de histórico
+  - Também cobre o estado de erro e o dashboard sobrevivendo a uma falha da IA
+- [X] **T30.6** Testes das views de histórico
   - Listagem só traz análises do usuário logado
   - Detalhe de análise de outro usuário retorna 404
   - Rotas exigem login
-- [ ] **T30.7** Teste do intervalo mínimo entre gerações
+- [X] **T30.7** Teste do intervalo mínimo entre gerações
   - Segunda solicitação dentro da janela é bloqueada com mensagem, sem chamar o agente
-- [ ] **T30.8** Teste do management command
+- [X] **T30.8** Teste do management command
   - Gera uma análise por usuário ativo; falha de um usuário não interrompe os demais
-- [ ] **T30.9** Rodar a suíte completa e garantir que os testes anteriores continuam passando
+- [X] **T30.9** Rodar a suíte completa e garantir que os testes anteriores continuam passando
+  - 75 testes novos em `ai/`; suíte total em 169 testes
 
 #### T31. Documentação
 
