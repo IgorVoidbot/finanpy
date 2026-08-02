@@ -670,12 +670,16 @@
 
 #### T31. Documentação
 
-- [ ] **T31.1** Adicionar seção "Agente de IA" no `README.md`
+- [X] **T31.1** Adicionar seção "Agente de IA" no `README.md`
   - Como obter e configurar `DEEPSEEK_API_KEY`, variáveis disponíveis, comandos de geração
   - Aviso de custo: cada análise consome tokens da API
-- [ ] **T31.2** Versionar o `.env.example` com todas as chaves esperadas
-- [ ] **T31.3** Atualizar `CLAUDE.md` com a app `ai` (domínio, convenções e regra de isolamento por usuário)
-- [ ] **T31.4** Atualizar `relatorio.md` com a nova app, o model `AIAnalysis` e o fluxo do agente
+  - Inclui a nota de privacidade/isolamento e as settings de IA na tabela de variáveis
+- [X] **T31.2** Versionar o `.env.example` com todas as chaves esperadas
+  - Já entregue na T24.3; conferido contra os `os.environ.get()` do `settings.py` — nenhuma chave faltando
+- [X] **T31.3** Atualizar `CLAUDE.md` com a app `ai` (domínio, convenções e regra de isolamento por usuário)
+- [X] **T31.4** Atualizar `relatorio.md` com a nova app, o model `AIAnalysis` e o fluxo do agente
+  - Seção 15 reescrita de "planejado" para entregue, com as APIs do LangChain efetivamente usadas
+  - Estrutura, settings, modelo de dados, URLs, views, templates, funcionalidades, testes e status das sprints atualizados
 
 ---
 
