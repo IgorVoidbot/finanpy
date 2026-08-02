@@ -1,6 +1,6 @@
 # Relatório Completo do Projeto — Finanpy
 
-> Gerado em: 2026-05-18
+> Gerado em: 2026-05-18 · Atualizado em: 2026-08-02 (Sprints 8 e 9)
 
 ---
 
@@ -16,6 +16,8 @@
 | Frontend | TailwindCSS via CDN + Django Template Language |
 | Autenticação | Customizada (e-mail como USERNAME_FIELD) |
 | Interface | Português Brasileiro |
+| Testes | pytest + pytest-django (94 testes) |
+| Containerização | Docker + Docker Compose (Python 3.12-slim) |
 
 ---
 
@@ -28,13 +30,21 @@ asgiref==3.11.1
 Django==6.0.3
 sqlparse==0.5.5
 tzdata==2026.1
+pytest
+pytest-django
 ```
+
+> O arquivo é gravado em UTF-8 sem BOM — obrigatório para o `pip install` funcionar dentro do container Linux.
 
 ### Frontend
 - TailwindCSS via CDN (sem build step)
 - Fonte Inter via Google Fonts CDN
 - JavaScript Vanilla (sem frameworks)
 - Tema escuro (dark mode nativo)
+
+### Infraestrutura
+- Docker (imagem base `python:3.12-slim`)
+- Docker Compose v2 (serviço `web` + volume nomeado `finanpy_db`)
 
 ---
 
@@ -133,12 +143,20 @@ pyfinance/
 ├── static/                          # Arquivos estáticos
 ├── manage.py
 ├── requirements.txt
+├── pytest.ini                       # Configuração do pytest-django
+├── conftest.py                      # Fixtures compartilhadas dos testes
+├── Dockerfile                       # Imagem da aplicação (Python 3.12-slim)
+├── docker-compose.yml               # Serviço web + volume finanpy_db
+├── .dockerignore                    # Exclusões do build context
 ├── CLAUDE.md                        # Guia de desenvolvimento para Claude Code
 ├── README.md                        # Documentação do projeto
 ├── TASKS.md                         # Lista de tarefas por sprint
 ├── PRD.md                           # Product Requirements Document
+├── relatorio.md                     # Este relatório
 └── db.sqlite3                       # Banco de dados SQLite
 ```
+
+> Cada app possui seu próprio `tests.py`; o dashboard e os testes de segurança ficam em `core/test_dashboard.py` e `core/test_security.py`.
 
 ---
 
@@ -152,9 +170,12 @@ pyfinance/
 | `LOGOUT_REDIRECT_URL` | `'/'` |
 | `LANGUAGE_CODE` | `'pt-br'` |
 | `TIME_ZONE` | `'America/Sao_Paulo'` |
-| `DATABASES` | SQLite (`db.sqlite3`) |
+| `DATABASES` | SQLite — caminho vindo de `DJANGO_DB_PATH` ou `BASE_DIR / 'db.sqlite3'` |
 | `SECURE_BROWSER_XSS_FILTER` | `True` |
 | `X_CONTENT_TYPE_OPTIONS` | `'nosniff'` |
+| `SECURE_CONTENT_TYPE_NOSNIFF` | `True` |
+
+A variável de ambiente `DJANGO_DB_PATH` permite apontar o SQLite para fora do diretório do projeto (usada pelo Docker para gravar no volume). Quando ausente, o comportamento é o padrão `BASE_DIR / 'db.sqlite3'`.
 
 ### INSTALLED_APPS
 ```
@@ -505,9 +526,73 @@ Tag para marcar o item ativo na sidebar/navbar com base na URL atual.
 - [x] `SECURE_BROWSER_XSS_FILTER = True`
 - [x] `X_CONTENT_TYPE_OPTIONS = 'nosniff'`
 
+### Testes
+- [x] `pytest` + `pytest-django` configurados (`pytest.ini`)
+- [x] Fixtures base compartilhadas em `conftest.py`
+- [x] Cobertura de users, profiles, accounts, categories, transactions, dashboard e segurança
+- [x] 94 testes passando
+
+### Infraestrutura
+- [x] `Dockerfile` com Python 3.12-slim e usuário não-root
+- [x] `docker-compose.yml` com serviço web
+- [x] Volume nomeado para persistência do banco
+- [x] Migrações aplicadas automaticamente na subida do container
+- [x] Comandos Docker documentados no README
+
 ---
 
-## 13. Status das Sprints
+## 13. Execução via Docker
+
+### Arquivos
+
+| Arquivo | Conteúdo |
+|---|---|
+| `Dockerfile` | Base `python:3.12-slim`; instala `requirements.txt` em camada separada (cache de dependências); cria o usuário não-root `appuser` (uid 1000); expõe a porta 8000 |
+| `docker-compose.yml` | Serviço `web` (build local), mapeamento `8000:8000`, volume `finanpy_db` em `/app/data`, `restart: unless-stopped` |
+| `.dockerignore` | Exclui `.git`, `.venv`, `__pycache__`, `db.sqlite3` local, `qa_screenshots/` e artefatos de teste do build context |
+
+### Comando de inicialização
+
+```
+sh -c "python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
+```
+
+As migrações são aplicadas a cada subida do container, antes do servidor iniciar.
+
+### Persistência do banco
+
+O SQLite é gravado em `/app/data/db.sqlite3`, dentro do volume nomeado `finanpy_db`. O caminho vem da variável de ambiente `DJANGO_DB_PATH`, definida no `docker-compose.yml`.
+
+O volume é necessário porque um volume nomeado não pode ser montado sobre um arquivo isolado — apenas sobre um diretório. Os dados sobrevivem a `docker compose down` e a rebuilds da imagem; `docker compose down -v` apaga o banco.
+
+### Comandos principais
+
+```bash
+docker compose up --build           # subir (build + migrate + runserver)
+docker compose up -d --build        # subir em background
+docker compose logs -f web          # acompanhar logs
+docker compose down                 # parar (preserva o banco)
+docker compose down -v              # parar e apagar o banco
+docker compose exec web python manage.py createsuperuser
+docker compose exec web pytest      # rodar os testes no container
+```
+
+### Resultado da validação (T23.5)
+
+| Verificação | Resultado |
+|---|---|
+| `docker compose build` | Imagem `pyfinance-web` construída |
+| Subida do container | Migrações aplicadas; `System check identified no issues` |
+| `GET /` e `GET /login/` | HTTP 200 |
+| Arquivo do banco | `/app/data/db.sqlite3` criado, dono `appuser` |
+| Persistência | Registro criado sobreviveu a `down` + `up` |
+| Suíte de testes no container | 94 testes passando |
+
+> O container roda o `runserver`, adequado a desenvolvimento e avaliação. Para produção seria necessário um servidor WSGI (Gunicorn/uWSGI), `DEBUG = False`, `ALLOWED_HOSTS` configurado e servidor dedicado para estáticos.
+
+---
+
+## 14. Status das Sprints
 
 | Sprint | Tema | Status |
 |---|---|---|
@@ -518,38 +603,12 @@ Tag para marcar o item ativo na sidebar/navbar com base na URL atual.
 | Sprint 5 | Dashboard | Concluída |
 | Sprint 6 | Refinamentos e Responsividade | Concluída |
 | Sprint 7 | Polimento e Preparação para Produção | Concluída |
-| Sprint 8 | Testes | Pendente |
-| Sprint 9 | Docker | Pendente |
+| Sprint 8 | Testes | Concluída |
+| Sprint 9 | Docker | Concluída |
 
-### Progresso geral: ~90% concluído
+### Progresso geral: 100% concluído
 
----
-
-## 14. Tarefas Pendentes
-
-### Sprint 8 — Testes
-
-| Tarefa | Descrição |
-|---|---|
-| T21.1 | Configurar `pytest` e `pytest-django` + `pytest.ini` |
-| T21.2 | Criar fixtures base: usuário, conta, categoria, transação |
-| T22.1 | Testes `users`: cadastro, login, logout, e-mail inválido |
-| T22.2 | Testes `profiles`: edição, criação automática via signal |
-| T22.3 | Testes `accounts`: CRUD, saldo inicial = saldo atual na criação |
-| T22.4 | Testes `categories`: CRUD, padrão via signal, proteção exclusão |
-| T22.5 | Testes `transactions`: CRUD, atualização de saldo, filtros |
-| T22.6 | Testes `dashboard`: cálculos de saldos e totais mensais |
-| T22.7 | Testes de segurança: acesso a dados de outro usuário retorna 404 |
-
-### Sprint 9 — Docker
-
-| Tarefa | Descrição |
-|---|---|
-| T23.1 | Criar `Dockerfile` com Python 3.12 |
-| T23.2 | Criar `docker-compose.yml` com serviço web |
-| T23.3 | Configurar volume para persistir `db.sqlite3` |
-| T23.4 | Documentar comandos Docker no README |
-| T23.5 | Testar build e execução completa |
+Todas as tarefas do `TASKS.md` estão marcadas como concluídas.
 
 ---
 
@@ -573,7 +632,7 @@ Tag para marcar o item ativo na sidebar/navbar com base na URL atual.
 
 | Arquivo | Conteúdo |
 |---|---|
-| `README.md` | Descrição, stack, instalação, comandos, estrutura, settings configuráveis |
+| `README.md` | Descrição, stack, instalação local, execução via Docker, comandos, estrutura, settings configuráveis |
 | `CLAUDE.md` | Guia de desenvolvimento para Claude Code: comandos, arquitetura, convenções, design system |
 | `TASKS.md` | Lista completa de tarefas por sprint com status de conclusão |
 | `PRD.md` | Product Requirements Document com requisitos do produto |
