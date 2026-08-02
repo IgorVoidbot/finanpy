@@ -488,7 +488,7 @@
 
 #### T25. Model `AIAnalysis` e persistência
 
-- [ ] **T25.1** Criar o model `AIAnalysis` em `ai/models.py`
+- [X] **T25.1** Criar o model `AIAnalysis` em `ai/models.py`
   - `user = ForeignKey(User, on_delete=CASCADE, related_name='ai_analyses')`
   - `status = CharField(max_length=10, choices=STATUS_CHOICES)` — `success`, `error`
   - `summary = TextField(blank=True)`
@@ -503,15 +503,15 @@
   - `iterations = PositiveSmallIntegerField(default=0)`
   - `error_message = TextField(blank=True)`
   - `created_at` (auto_now_add) e `updated_at` (auto_now)
-- [ ] **T25.2** Configurar `class Meta`
+- [X] **T25.2** Configurar `class Meta`
   - `ordering = ['-created_at']`
   - `indexes = [models.Index(fields=['user', '-created_at'])]`
   - `verbose_name = 'análise de IA'` e `verbose_name_plural = 'análises de IA'`
-- [ ] **T25.3** Implementar `__str__` e helpers de consulta
+- [X] **T25.3** Implementar `__str__` e helpers de consulta
   - Manager ou classmethod `latest_success_for(user)` retornando a última análise com `status='success'`
   - Property `health_color_class` mapeando a faixa do score para a classe Tailwind (ver 9.10 do PRD)
-- [ ] **T25.4** Registrar no admin com `list_display`, `list_filter` e `readonly_fields`
-- [ ] **T25.5** Executar `makemigrations ai` e `migrate`
+- [X] **T25.4** Registrar no admin com `list_display`, `list_filter` e `readonly_fields`
+- [X] **T25.5** Executar `makemigrations ai` e `migrate`
 
 #### T26. Tools de acesso ao banco de dados
 
