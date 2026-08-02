@@ -10,7 +10,7 @@ Contexto esperado (ver ai.services.analysis_panel_context):
 
 {% if ai_analysis_enabled %}
 
-<div class="bg-gray-900 border border-gray-700 rounded-xl p-6 border-t-2 border-t-violet-500 mb-8">
+<div data-ai-card class="bg-gray-900 border border-gray-700 rounded-xl p-6 border-t-2 border-t-violet-500 mb-8">
 
     <!-- Cabeçalho -->
     <div class="flex items-start justify-between gap-4 mb-4">
@@ -50,25 +50,42 @@ Contexto esperado (ver ai.services.analysis_panel_context):
             </span>
         </div>
 
-        <p class="text-sm text-gray-300 mb-4">{{ latest_ai_analysis.summary }}</p>
+        <!-- Resumo: 2 linhas até o usuário expandir -->
+        <p data-ai-summary class="text-sm text-gray-300 mb-4 line-clamp-2">
+            {{ latest_ai_analysis.summary }}
+        </p>
 
-        {% if latest_ai_analysis.insights %}
-            <h4 class="text-sm font-medium text-gray-400 mb-2">Insights</h4>
-            <ul class="space-y-1 mb-4 text-sm text-gray-300 list-disc list-inside">
-                {% for insight in latest_ai_analysis.insights %}
-                    <li>{{ insight }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
+        <div data-ai-details class="hidden">
+            {% if latest_ai_analysis.insights %}
+                <h4 class="text-sm font-medium text-gray-400 mb-2">Insights</h4>
+                <ul class="space-y-1 mb-4 text-sm text-gray-300 list-disc list-inside">
+                    {% for insight in latest_ai_analysis.insights %}
+                        <li>{{ insight }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
 
-        {% if latest_ai_analysis.tips %}
-            <h4 class="text-sm font-medium text-gray-400 mb-2">Dicas</h4>
-            <ul class="space-y-1 mb-4 text-sm text-gray-300 list-disc list-inside">
-                {% for tip in latest_ai_analysis.tips %}
-                    <li>{{ tip }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
+            {% if latest_ai_analysis.tips %}
+                <h4 class="text-sm font-medium text-gray-400 mb-2">Dicas</h4>
+                <ul class="space-y-1 mb-4 text-sm text-gray-300 list-disc list-inside">
+                    {% for tip in latest_ai_analysis.tips %}
+                        <li>{{ tip }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        <button
+            type="button"
+            data-ai-toggle
+            aria-expanded="false"
+            class="flex items-center gap-1 text-sm text-violet-400 hover:text-violet-300 transition-colors duration-200 mb-4"
+        >
+            <span data-ai-toggle-label>Ver análise completa</span>
+            <svg data-ai-toggle-icon class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+        </button>
 
     {% elif last_ai_analysis %}
 
@@ -104,5 +121,33 @@ Contexto esperado (ver ai.services.analysis_panel_context):
     </div>
 
 </div>
+
+<script>
+(function () {
+    if (window.aiCardToggleBound) {
+        return;
+    }
+    window.aiCardToggleBound = true;
+
+    document.addEventListener('click', function (event) {
+        var button = event.target.closest('[data-ai-toggle]');
+        if (!button) {
+            return;
+        }
+
+        var card = button.closest('[data-ai-card]');
+        var summary = card.querySelector('[data-ai-summary]');
+        var details = card.querySelector('[data-ai-details]');
+        var expanded = button.getAttribute('aria-expanded') === 'true';
+
+        button.setAttribute('aria-expanded', String(!expanded));
+        summary.classList.toggle('line-clamp-2', expanded);
+        details.classList.toggle('hidden', expanded);
+        button.querySelector('[data-ai-toggle-label]').textContent =
+            expanded ? 'Ver análise completa' : 'Ver menos';
+        button.querySelector('[data-ai-toggle-icon]').classList.toggle('rotate-180', !expanded);
+    });
+}());
+</script>
 
 {% endif %}
