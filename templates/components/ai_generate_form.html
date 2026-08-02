@@ -1,0 +1,73 @@
+{% comment %}
+Botão de geração de análise sob demanda.
+
+Enquanto o intervalo mínimo entre gerações não vence, o botão dá lugar ao
+tempo restante — a `GenerateAnalysisView` valida o intervalo de novo no POST.
+{% endcomment %}
+
+{% if ai_cooldown_minutes %}
+
+    <span class="text-xs text-gray-500">
+        Nova análise disponível em {{ ai_cooldown_minutes }} minuto{{ ai_cooldown_minutes|pluralize }}
+    </span>
+
+{% else %}
+
+    <form method="post" action="{% url 'ai:generate' %}" data-ai-generate>
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button
+            type="submit"
+            class="bg-violet-500 hover:bg-violet-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+            <svg
+                data-ai-generate-spinner
+                class="hidden animate-spin h-4 w-4 text-white"
+                fill="none" viewBox="0 0 24 24"
+            >
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+            <span data-ai-generate-label>
+                {% if latest_ai_analysis or last_ai_analysis %}Gerar nova análise{% else %}Gerar primeira análise{% endif %}
+            </span>
+        </button>
+    </form>
+
+    <script>
+    (function () {
+        // The form can appear more than once per page; a delegated listener
+        // covers every instance and binds only once.
+        if (window.aiGenerateBound) {
+            return;
+        }
+        window.aiGenerateBound = true;
+
+        document.addEventListener('submit', function (event) {
+            var form = event.target.closest('form[data-ai-generate]');
+            if (!form || form.dataset.aiGenerateSubmitted) {
+                return;
+            }
+            form.dataset.aiGenerateSubmitted = '1';
+
+            var button = form.querySelector('button[type="submit"]');
+            if (!button) {
+                return;
+            }
+            button.disabled = true;
+
+            var spinner = button.querySelector('[data-ai-generate-spinner]');
+            if (spinner) {
+                spinner.classList.remove('hidden');
+            }
+
+            var label = button.querySelector('[data-ai-generate-label]');
+            if (label) {
+                label.textContent = 'Analisando...';
+            }
+        });
+    }());
+    </script>
+
+{% endif %}

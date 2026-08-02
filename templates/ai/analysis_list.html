@@ -1,0 +1,112 @@
+{% extends 'base_app.html' %}
+
+{% block app_title %}Análises{% endblock %}
+
+{% block page_content %}
+
+<div class="mb-6 flex flex-wrap items-start justify-between gap-4">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-100">Análises</h1>
+        <p class="text-sm text-gray-400 mt-1">Histórico dos diagnósticos gerados pela IA.</p>
+    </div>
+    {% if ai_analysis_enabled %}
+        {% include 'components/ai_generate_form.html' %}
+    {% endif %}
+</div>
+
+{% if analyses %}
+
+    <div class="space-y-4">
+        {% for analysis in analyses %}
+            <a
+                href="{% url 'ai:analysis_detail' analysis.pk %}"
+                class="block bg-gray-900 border border-gray-700 rounded-xl p-5 hover:border-violet-500/50 transition-colors duration-200"
+            >
+                <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
+                    <div class="flex items-center gap-3">
+                        {% if analysis.is_success %}
+                            <span class="text-2xl font-bold {{ analysis.health_text_class }}">
+                                {{ analysis.health_score }}
+                            </span>
+                            <span class="{{ analysis.health_color_class }} border text-xs font-medium px-2 py-1 rounded-full">
+                                {{ analysis.get_health_label_display }}
+                            </span>
+                        {% else %}
+                            <span class="bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-medium px-2 py-1 rounded-full">
+                                Falhou
+                            </span>
+                        {% endif %}
+                    </div>
+                    <span class="text-xs text-gray-500 whitespace-nowrap">
+                        {{ analysis.created_at|date:"d/m/Y" }} às {{ analysis.created_at|date:"H:i" }}
+                    </span>
+                </div>
+
+                {% if analysis.is_success %}
+                    <p class="text-sm text-gray-300 line-clamp-2">{{ analysis.summary }}</p>
+                    <p class="text-xs text-gray-500 mt-2">
+                        Período de {{ analysis.period_start|date:"d/m/Y" }} a {{ analysis.period_end|date:"d/m/Y" }}
+                    </p>
+                {% else %}
+                    <p class="text-sm text-rose-300">
+                        {{ analysis.error_message|default:"Não foi possível gerar a análise." }}
+                    </p>
+                {% endif %}
+            </a>
+        {% endfor %}
+    </div>
+
+    {% if page_obj.has_other_pages %}
+        <div class="mt-6 flex items-center justify-between">
+            <p class="text-sm text-gray-400">
+                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+            </p>
+            <div class="flex items-center gap-2">
+                {% if page_obj.has_previous %}
+                    <a
+                        href="?page={{ page_obj.previous_page_number }}"
+                        class="bg-gray-800 hover:bg-gray-700 text-gray-100 px-3 py-1.5 rounded text-sm transition-colors duration-200"
+                    >
+                        Anterior
+                    </a>
+                {% else %}
+                    <span class="bg-gray-800/50 text-gray-600 px-3 py-1.5 rounded text-sm cursor-not-allowed">
+                        Anterior
+                    </span>
+                {% endif %}
+
+                {% if page_obj.has_next %}
+                    <a
+                        href="?page={{ page_obj.next_page_number }}"
+                        class="bg-gray-800 hover:bg-gray-700 text-gray-100 px-3 py-1.5 rounded text-sm transition-colors duration-200"
+                    >
+                        Próxima
+                    </a>
+                {% else %}
+                    <span class="bg-gray-800/50 text-gray-600 px-3 py-1.5 rounded text-sm cursor-not-allowed">
+                        Próxima
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
+{% else %}
+
+    <div class="bg-gray-900 border border-dashed border-gray-700 rounded-xl p-10 text-center">
+        <svg class="w-10 h-10 text-gray-700 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+        </svg>
+        <p class="text-sm text-gray-400">
+            {% if ai_analysis_enabled %}
+                Você ainda não gerou nenhuma análise. Gere a primeira e ela aparecerá aqui.
+            {% else %}
+                A análise inteligente está desligada neste ambiente.
+            {% endif %}
+        </p>
+    </div>
+
+{% endif %}
+
+{% endblock %}

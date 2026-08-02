@@ -5,14 +5,14 @@
 
 {% block page_content %}
 <!-- Cabeçalho -->
-<div class="mb-6 flex items-center justify-between">
+<div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
     <div>
         <h1 class="text-2xl font-bold text-gray-100">Minhas Transações</h1>
         <p class="text-sm text-gray-400 mt-1">Acompanhe e gerencie todas as suas movimentações financeiras.</p>
     </div>
     <a
         href="{% url 'transactions:transaction_create' %}"
-        class="bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2.5 px-6 rounded-lg transition-colors duration-200"
+        class="bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2.5 px-6 rounded-lg transition-colors duration-200 flex-shrink-0 whitespace-nowrap text-center"
     >
         Nova Transação
     </a>

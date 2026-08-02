@@ -6,6 +6,11 @@ services:
       - '8000:8000'
     environment:
       DJANGO_DB_PATH: /app/data/db.sqlite3
+    # Segredos do agente de IA (DEEPSEEK_API_KEY etc.).
+    # Opcional: sem .env o sistema sobe com a analise por IA desligada.
+    env_file:
+      - path: .env
+        required: false
     volumes:
       - finanpy_db:/app/data
     restart: unless-stopped

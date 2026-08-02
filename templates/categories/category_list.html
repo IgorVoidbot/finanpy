@@ -3,14 +3,14 @@
 {% block app_title %}Minhas Categorias{% endblock %}
 
 {% block page_content %}
-<div class="mb-6 flex items-center justify-between">
+<div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
     <div>
         <h1 class="text-2xl font-bold text-gray-100">Minhas Categorias</h1>
         <p class="text-sm text-gray-400 mt-1">Gerencie as categorias das suas transações.</p>
     </div>
     <a
         href="{% url 'categories:category_create' %}"
-        class="bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2.5 px-6 rounded-lg transition-colors duration-200"
+        class="bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2.5 px-6 rounded-lg transition-colors duration-200 flex-shrink-0 whitespace-nowrap text-center"
     >
         Nova Categoria
     </a>

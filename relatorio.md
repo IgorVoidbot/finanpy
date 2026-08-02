@@ -1,12 +1,12 @@
 # Relatório Completo do Projeto — Finanpy
 
-> Gerado em: 2026-05-18 · Atualizado em: 2026-08-02 (Sprints de Testes e Docker concluídas; Sprint 8 — Agente de IA — planejada)
+> Gerado em: 2026-05-18 · Atualizado em: 2026-08-02 (Sprint 8 — Agente de IA — concluída)
 
 ---
 
 ## 1. Visão Geral
 
-**Finanpy** é uma aplicação web de gestão financeira pessoal desenvolvida com Django full-stack. Permite ao usuário controlar contas bancárias, categorias de transações e movimentações financeiras, com dashboard de resumo mensal.
+**Finanpy** é uma aplicação web de gestão financeira pessoal desenvolvida com Django full-stack. Permite ao usuário controlar contas bancárias, categorias de transações e movimentações financeiras, com dashboard de resumo mensal e análise automatizada das finanças por um agente de IA.
 
 | Item | Valor |
 |---|---|
@@ -15,8 +15,9 @@
 | Banco de dados | SQLite (db.sqlite3) |
 | Frontend | TailwindCSS via CDN + Django Template Language |
 | Autenticação | Customizada (e-mail como USERNAME_FIELD) |
+| Agente de IA | LangChain 1.0 + DeepSeek (app `ai`) |
 | Interface | Português Brasileiro |
-| Testes | pytest + pytest-django (94 testes) |
+| Testes | pytest + pytest-django (169 testes) |
 | Containerização | Docker + Docker Compose (Python 3.12-slim) |
 
 ---
@@ -32,6 +33,9 @@ sqlparse==0.5.5
 tzdata==2026.1
 pytest
 pytest-django
+langchain==1.3.14
+langchain-deepseek==1.1.0
+python-dotenv==1.2.2
 ```
 
 > O arquivo é gravado em UTF-8 sem BOM — obrigatório para o `pip install` funcionar dentro do container Linux.
@@ -111,6 +115,25 @@ pyfinance/
 │   ├── apps.py
 │   └── migrations/
 │
+├── ai/                              # Agente de análise financeira
+│   ├── models.py                    # AIAnalysis (FK → User) + manager
+│   ├── tools.py                     # build_tools(user) — 7 tools de leitura
+│   ├── prompts.py                   # System prompt do consultor financeiro (PT-BR)
+│   ├── schemas.py                   # FinancialAnalysis (Pydantic)
+│   ├── agent.py                     # build_finance_agent(user) + ChatDeepSeek
+│   ├── services.py                  # run_analysis_for_user(user) e cooldown
+│   ├── views.py                     # Histórico, detalhe e geração (POST)
+│   ├── urls.py                      # analises/*
+│   ├── admin.py
+│   ├── apps.py
+│   ├── management/commands/
+│   │   └── run_ai_analysis.py       # Geração em lote
+│   ├── test_tools.py                # Valores das tools + isolamento por usuário
+│   ├── test_services.py
+│   ├── test_views.py
+│   ├── test_commands.py
+│   └── migrations/
+│
 ├── templates/                       # Todos os templates (globais)
 │   ├── base.html
 │   ├── base_auth.html
@@ -121,7 +144,12 @@ pyfinance/
 │   │   ├── navbar.html
 │   │   ├── sidebar.html
 │   │   ├── messages.html
-│   │   └── modal_confirm.html
+│   │   ├── modal_confirm.html
+│   │   ├── ai_insight_card.html     # Card da última análise no dashboard
+│   │   └── ai_generate_form.html    # Botão de geração + estado de carregamento
+│   ├── ai/
+│   │   ├── analysis_list.html
+│   │   └── analysis_detail.html
 │   ├── users/
 │   │   ├── signup.html
 │   │   └── login.html
@@ -143,8 +171,9 @@ pyfinance/
 ├── static/                          # Arquivos estáticos
 ├── manage.py
 ├── requirements.txt
+├── .env.example                     # Chaves esperadas no .env (sem valores reais)
 ├── pytest.ini                       # Configuração do pytest-django
-├── conftest.py                      # Fixtures compartilhadas dos testes
+├── conftest.py                      # Fixtures compartilhadas + dublê do agente de IA
 ├── Dockerfile                       # Imagem da aplicação (Python 3.12-slim)
 ├── docker-compose.yml               # Serviço web + volume finanpy_db
 ├── .dockerignore                    # Exclusões do build context
@@ -156,7 +185,7 @@ pyfinance/
 └── db.sqlite3                       # Banco de dados SQLite
 ```
 
-> Cada app possui seu próprio `tests.py`; o dashboard e os testes de segurança ficam em `core/test_dashboard.py` e `core/test_security.py`.
+> Cada app possui seu próprio `tests.py`; o dashboard e os testes de segurança ficam em `core/test_dashboard.py` e `core/test_security.py`. A app `ai` divide os testes por área (`test_tools.py`, `test_services.py`, `test_views.py`, `test_commands.py`).
 
 ---
 
@@ -177,9 +206,25 @@ pyfinance/
 
 A variável de ambiente `DJANGO_DB_PATH` permite apontar o SQLite para fora do diretório do projeto (usada pelo Docker para gravar no volume). Quando ausente, o comportamento é o padrão `BASE_DIR / 'db.sqlite3'`.
 
+### Settings do agente de IA
+
+Carregadas do ambiente / `.env` por `python-dotenv`, chamado no topo do `settings.py`.
+
+| Variável | Padrão | Descrição |
+|---|---|---|
+| `DEEPSEEK_API_KEY` | vazio | Chave da API DeepSeek. Nunca versionada. |
+| `DEEPSEEK_MODEL` | `'deepseek-chat'` | Identificador do modelo usado pelo `ChatDeepSeek` |
+| `AI_ANALYSIS_ENABLED` | `True` | Feature flag; forçada a `False` quando não há chave |
+| `AI_ANALYSIS_MIN_INTERVAL_MINUTES` | `15` | Intervalo mínimo entre gerações sob demanda por usuário |
+| `AI_AGENT_TIMEOUT_SECONDS` | `60` | Timeout de uma execução do agente |
+| `AI_AGENT_MAX_ITERATIONS` | `10` | Teto de chamadas ao modelo no loop do agente |
+| `AI_ANALYSIS_MONTHS_WINDOW` | `6` | Janela padrão de meses considerada na análise |
+
+Os helpers `env_bool()` e `env_int()` no próprio `settings.py` fazem a leitura tolerante a valores inválidos.
+
 ### INSTALLED_APPS
 ```
-core, accounts, categories, profiles, transactions, users
+core, accounts, ai, categories, profiles, transactions, users
 django.contrib.admin, auth, contenttypes, sessions, messages, staticfiles
 ```
 
@@ -194,7 +239,8 @@ User (AbstractUser)
  ├── Profile           (OneToOne  → User)
  ├── Account           (ForeignKey → User)
  ├── Category          (ForeignKey → User)
- └── Transaction       (ForeignKey → User, Account, Category)
+ ├── Transaction       (ForeignKey → User, Account, Category)
+ └── AIAnalysis        (ForeignKey → User)
 ```
 
 ### User (`users/models.py`)
@@ -275,6 +321,31 @@ User (AbstractUser)
 
 - `ordering = ['-date', '-created_at']`
 
+### AIAnalysis (`ai/models.py`)
+
+| Campo | Tipo | Detalhes |
+|---|---|---|
+| `user` | `ForeignKey(User)` | `related_name='ai_analyses'`, `on_delete=CASCADE` |
+| `status` | `CharField(10)` | choices: success, error |
+| `summary` | `TextField` | diagnóstico geral do período |
+| `insights` | `JSONField` | lista de observações |
+| `tips` | `JSONField` | lista de recomendações |
+| `health_score` | `PositiveSmallIntegerField` | 0 a 100, null quando falha |
+| `health_label` | `CharField(20)` | choices: critical, attention, good, excellent |
+| `period_start` / `period_end` | `DateField` | janela efetivamente analisada |
+| `model_name` | `CharField(50)` | modelo DeepSeek usado na execução |
+| `prompt_tokens` / `completion_tokens` / `total_tokens` | `PositiveIntegerField` | consumo da execução |
+| `duration_ms` | `PositiveIntegerField` | duração da execução |
+| `iterations` | `PositiveSmallIntegerField` | chamadas ao modelo no loop |
+| `error_message` | `TextField` | texto fixo em PT-BR; nunca contém a chave da API |
+| `created_at` | `DateTimeField` | `auto_now_add=True` |
+| `updated_at` | `DateTimeField` | `auto_now=True` |
+
+- `ordering = ['-created_at']`, índice em `['user', '-created_at']`
+- Manager com `latest_success_for(user)` e queryset `for_user()` / `successful()`
+- Properties `health_color_class` e `health_text_class` — classes Tailwind por rótulo
+- O histórico é preservado: análises antigas nunca são sobrescritas, e as que falham também são gravadas
+
 ---
 
 ## 6. Views e URLs
@@ -301,6 +372,9 @@ User (AbstractUser)
 | `/transacoes/nova/` | `TransactionCreateView` | transactions |
 | `/transacoes/<pk>/editar/` | `TransactionUpdateView` | transactions |
 | `/transacoes/<pk>/excluir/` | `TransactionDeleteView` | transactions |
+| `/analises/` | `AnalysisListView` | ai |
+| `/analises/gerar/` | `GenerateAnalysisView` (POST) | ai |
+| `/analises/<pk>/` | `AnalysisDetailView` | ai |
 
 ### Descrição das Views por App
 
@@ -313,6 +387,7 @@ User (AbstractUser)
   - `monthly_balance`: income − expense
   - `recent_transactions`: últimas 5 transações
   - `expenses_by_category`: gastos agrupados por categoria (mês corrente)
+  - contexto do card de IA via `ai.services.analysis_panel_context()`, dentro de `try/except` — falha da IA não derruba a página
 
 #### `users/views.py`
 - **`SignUpView(CreateView)`** — cadastro com auto-login após registro, redireciona ao dashboard
@@ -340,6 +415,11 @@ User (AbstractUser)
 - **`TransactionCreateView`** — filtra `account`/`category` pelo user via `get_form()`
 - **`TransactionUpdateView`** — filtra queryset por user
 - **`TransactionDeleteView`** — filtra queryset por user; mensagem de sucesso
+
+#### `ai/views.py`
+- **`AnalysisListView(ListView)`** — histórico paginado de 10 em 10, filtrado por user
+- **`AnalysisDetailView(DetailView)`** — queryset filtrado por user; análise de outro usuário retorna 404
+- **`GenerateAnalysisView(View)`** — só aceita POST (GET retorna 405); revalida o intervalo mínimo antes de executar, chama `run_analysis_for_user()` e redireciona com `messages`. O destino vem de `next`, validado por `url_has_allowed_host_and_scheme`, com o dashboard como padrão
 
 ---
 
@@ -410,9 +490,11 @@ Tag para marcar o item ativo na sidebar/navbar com base na URL atual.
 | Arquivo | Descrição |
 |---|---|
 | `components/navbar.html` | Logo, botão hambúrguer (mobile), nome do usuário, logout |
-| `components/sidebar.html` | Links com ícones SVG: Dashboard, Contas, Categorias, Transações, Perfil |
+| `components/sidebar.html` | Links com ícones SVG: Dashboard, Contas, Categorias, Transações, Análises, Perfil |
 | `components/messages.html` | Mensagens Django com auto-dismiss em 5s (success, error, warning, info) |
 | `components/modal_confirm.html` | Modal de confirmação reutilizável para exclusões (JavaScript vanilla) |
+| `components/ai_insight_card.html` | Card da última análise de IA, com estados vazio, de erro e desligado |
+| `components/ai_generate_form.html` | Botão "Gerar nova análise" com spinner e bloqueio de duplo envio |
 
 ### Páginas Públicas
 | Arquivo | Descrição |
@@ -439,6 +521,8 @@ Tag para marcar o item ativo na sidebar/navbar com base na URL atual.
 | `transactions/transaction_list.html` | Tabela com barra de filtros, paginação (20/pág), modal |
 | `transactions/transaction_form.html` | Formulário de criar/editar transação |
 | `transactions/transaction_confirm_delete.html` | Confirmação de exclusão |
+| `ai/analysis_list.html` | Histórico de análises com paginação (10/pág) e estado vazio |
+| `ai/analysis_detail.html` | Análise completa + metadados da execução |
 
 ---
 
@@ -507,6 +591,18 @@ Tag para marcar o item ativo na sidebar/navbar com base na URL atual.
 - [x] Balanço mensal (entradas − saídas)
 - [x] Últimas 5 transações
 - [x] Gastos por categoria (mês corrente)
+- [x] Card da última análise de IA bem-sucedida
+
+### Análise de IA
+- [x] Agente LangChain 1.0 + DeepSeek escopado a um usuário por execução
+- [x] 7 tools de leitura somente-ORM, com parâmetros validados e com teto
+- [x] Saída estruturada validada por schema Pydantic (`FinancialAnalysis`)
+- [x] Card no dashboard com índice de saúde, resumo, insights e dicas
+- [x] Histórico paginado em `/analises/` com página de detalhe
+- [x] Geração sob demanda (POST) com estado de carregamento e intervalo mínimo
+- [x] Geração em lote via `python manage.py run_ai_analysis`
+- [x] Toda falha vira `AIAnalysis` com `status='error'`, sem quebrar o dashboard
+- [x] Funcionalidade some da interface quando não há `DEEPSEEK_API_KEY`
 
 ### UX / Interface
 - [x] Design dark (tema escuro)
@@ -522,6 +618,8 @@ Tag para marcar o item ativo na sidebar/navbar com base na URL atual.
 ### Segurança
 - [x] Todas as queries filtradas por `user=request.user`
 - [x] Acesso direto a dados de outro usuário retorna 404
+- [x] Tools do agente escopadas por closure; nenhuma expõe identificador de usuário
+- [x] Chave da API nunca aparece em log, mensagem de erro ou template
 - [x] `{% csrf_token %}` em todos os formulários
 - [x] `SECURE_BROWSER_XSS_FILTER = True`
 - [x] `X_CONTENT_TYPE_OPTIONS = 'nosniff'`
@@ -529,8 +627,9 @@ Tag para marcar o item ativo na sidebar/navbar com base na URL atual.
 ### Testes
 - [x] `pytest` + `pytest-django` configurados (`pytest.ini`)
 - [x] Fixtures base compartilhadas em `conftest.py`
-- [x] Cobertura de users, profiles, accounts, categories, transactions, dashboard e segurança
-- [x] 94 testes passando
+- [x] Cobertura de users, profiles, accounts, categories, transactions, dashboard, segurança e IA
+- [x] Dublê do agente (`FakeAgent`) no `conftest.py` — nenhum teste chama a API real
+- [x] 169 testes passando
 
 ### Infraestrutura
 - [x] `Dockerfile` com Python 3.12-slim e usuário não-root
@@ -548,7 +647,7 @@ Tag para marcar o item ativo na sidebar/navbar com base na URL atual.
 | Arquivo | Conteúdo |
 |---|---|
 | `Dockerfile` | Base `python:3.12-slim`; instala `requirements.txt` em camada separada (cache de dependências); cria o usuário não-root `appuser` (uid 1000); expõe a porta 8000 |
-| `docker-compose.yml` | Serviço `web` (build local), mapeamento `8000:8000`, volume `finanpy_db` em `/app/data`, `restart: unless-stopped` |
+| `docker-compose.yml` | Serviço `web` (build local), mapeamento `8000:8000`, volume `finanpy_db` em `/app/data`, `env_file: .env` (chave da IA), `restart: unless-stopped` |
 | `.dockerignore` | Exclui `.git`, `.venv`, `__pycache__`, `db.sqlite3` local, `qa_screenshots/` e artefatos de teste do build context |
 
 ### Comando de inicialização
@@ -575,6 +674,7 @@ docker compose down                 # parar (preserva o banco)
 docker compose down -v              # parar e apagar o banco
 docker compose exec web python manage.py createsuperuser
 docker compose exec web pytest      # rodar os testes no container
+docker compose exec web python manage.py run_ai_analysis
 ```
 
 ### Resultado da validação (T23.5)
@@ -586,7 +686,7 @@ docker compose exec web pytest      # rodar os testes no container
 | `GET /` e `GET /login/` | HTTP 200 |
 | Arquivo do banco | `/app/data/db.sqlite3` criado, dono `appuser` |
 | Persistência | Registro criado sobreviveu a `down` + `up` |
-| Suíte de testes no container | 94 testes passando |
+| Suíte de testes no container | 94 testes passando (tamanho da suíte à época da validação) |
 
 > O container roda o `runserver`, adequado a desenvolvimento e avaliação. Para produção seria necessário um servidor WSGI (Gunicorn/uWSGI), `DEBUG = False`, `ALLOWED_HOSTS` configurado e servidor dedicado para estáticos.
 
@@ -603,7 +703,7 @@ docker compose exec web pytest      # rodar os testes no container
 | Sprint 5 | Dashboard | Concluída |
 | Sprint 6 | Refinamentos e Responsividade | Concluída |
 | Sprint 7 | Polimento e Preparação para Produção | Concluída |
-| Sprint 8 | Agente de IA de Análise Financeira | **Planejada** |
+| Sprint 8 | Agente de IA de Análise Financeira | Concluída |
 | Sprint 9 | Testes | Concluída |
 | Sprint 10 | Docker | Concluída |
 
@@ -611,29 +711,29 @@ docker compose exec web pytest      # rodar os testes no container
 
 ### Progresso geral
 
-O escopo original do produto (Sprints 1 a 7, mais Testes e Docker) está **100% entregue**. A Sprint 8 — Agente de IA — está planejada e ainda não implementada.
+Todo o escopo previsto está **entregue**. A conexão com a API DeepSeek foi validada em 02/08/2026 (T24.6) e a primeira análise real foi gerada com sucesso no mesmo dia, fechando a Sprint 8 sem pendências.
 
 ---
 
-## 15. Próxima Entrega — Agente de IA (planejado)
+## 15. Agente de IA de Análise Financeira
 
-Funcionalidade especificada em **RF09** e na seção **8.5** do `PRD.md`, com as tarefas detalhadas na **Sprint 8** do `TASKS.md`. Nada abaixo está implementado ainda — esta seção descreve o que foi planejado.
+Funcionalidade especificada em **RF09** e na seção **8.5** do `PRD.md`, entregue na **Sprint 8** (`T24`–`T31` do `TASKS.md`).
 
 ### Escopo
 
-Um agente de IA especialista em finanças pessoais analisa os dados de cada usuário (contas, categorias, transações) e produz um diagnóstico com insights e dicas práticas em português brasileiro. A última análise aparece em card no dashboard; o histórico fica em `/analises/`.
+Um agente especialista em finanças pessoais analisa os dados de cada usuário (contas, categorias, transações) e produz um diagnóstico com insights e dicas práticas em português brasileiro. A última análise bem-sucedida aparece em card no dashboard; o histórico fica em `/analises/`.
 
-### Stack prevista
+### Stack
 
 | Item | Escolha |
 |---|---|
-| Framework de agente | LangChain 1.0 (`langchain`, `langchain-core`) |
-| Provedor de LLM | DeepSeek via `langchain-deepseek` (`ChatDeepSeek`) |
+| Framework de agente | LangChain 1.0 (`langchain==1.3.14`) |
+| Provedor de LLM | DeepSeek via `langchain-deepseek==1.1.0` (`ChatDeepSeek`) |
 | Identificador do modelo | Setting `DEEPSEEK_MODEL` (default `deepseek-chat`) |
 | Segredos | Variável de ambiente / `.env` com `python-dotenv` |
 | App Django | `ai/` |
 
-### Componentes planejados
+### Componentes
 
 | Módulo | Responsabilidade |
 |---|---|
@@ -646,17 +746,74 @@ Um agente de IA especialista em finanças pessoais analisa os dados de cada usu�
 | `ai/views.py` | Histórico, detalhe e geração sob demanda (POST) |
 | `ai/management/commands/run_ai_analysis.py` | Geração em lote para todos os usuários ativos |
 
-### Decisões de arquitetura registradas
+### Tools disponíveis ao agente
 
-- **Isolamento por usuário é a regra crítica.** O `user` é fixado no servidor por closure nas tools; a assinatura exposta ao modelo não contém identificador de usuário. Toolkits de SQL genérico são proibidos — todo acesso passa pelo ORM com `filter(user=...)`.
+Todas somente-leitura, todas escopadas ao usuário fixado no servidor, todas devolvendo dados já agregados e serializáveis (`Decimal` convertido para `float`, datas em ISO 8601):
+
+| Tool | Retorno |
+|---|---|
+| `get_financial_summary` | Saldo total, entradas/saídas do mês, balanço, nº de contas e transações |
+| `get_accounts_overview` | Contas com tipo, saldo inicial e saldo atual |
+| `get_expenses_by_category` | Saídas agrupadas por categoria, com valor e percentual |
+| `get_income_by_category` | Entradas agrupadas por categoria |
+| `get_monthly_totals` | Série mensal de entradas, saídas e balanço |
+| `get_recent_transactions` | Últimas N transações |
+| `get_largest_expenses` | Maiores saídas do período |
+
+### Fluxo de execução
+
+```
+run_analysis_for_user(user)
+  ├── verifica AI_ANALYSIS_ENABLED e a presença da chave
+  ├── build_finance_agent(user) → ChatDeepSeek + build_tools(user) + prompt + schema
+  ├── agent.invoke(...) → o modelo escolhe as tools; cada tool consulta o ORM filtrado por user
+  ├── saída estruturada validada como FinancialAnalysis
+  └── grava AIAnalysis (success) — ou, em qualquer falha, AIAnalysis (error)
+```
+
+### APIs do LangChain efetivamente usadas
+
+Confirmadas via MCP context7 contra a versão instalada e registradas no docstring de `ai/agent.py`:
+
+- `create_agent(model, tools, system_prompt=..., response_format=..., middleware=...)`
+- `ToolStrategy(FinancialAnalysis)` para a saída estruturada — a DeepSeek não tem modo nativo de structured output
+- `ModelCallLimitMiddleware(run_limit=...)` para o teto de iterações
+- `recursion_limit` no `config` do `invoke`, como rede de segurança do grafo
+
+### Decisões de arquitetura
+
+- **Isolamento por usuário é a regra crítica.** O `user` é fixado no servidor por closure nas tools; a assinatura exposta ao modelo não contém identificador de usuário. Toolkits de SQL genérico são proibidos — todo acesso passa pelo ORM com `filter(user=...)`. Coberto por testes bloqueantes em `ai/test_tools.py`.
 - **Execução síncrona no MVP**, com estado de carregamento na interface. Fila assíncrona fica como evolução futura, para não violar o RNF07 (simplicidade).
-- **Degradação graciosa**: indisponibilidade da API, chave ausente ou feature flag desligada não podem quebrar o dashboard.
-- **Testes sem rede**: a suíte substitui o modelo por um dublê; nenhuma chamada real à API DeepSeek.
-- **Documentação viva**: a API do LangChain 1.0 deve ser confirmada via MCP context7 durante a implementação, não assumida de memória.
+- **Degradação graciosa**: indisponibilidade da API, chave ausente ou feature flag desligada não quebram o dashboard. `run_analysis_for_user()` nunca propaga exceção.
+- **Testes sem rede**: a suíte substitui o agente por um dublê; nenhuma chamada real à API DeepSeek.
+- **Teto de iterações em duas camadas**: o `ModelCallLimitMiddleware` encerra o loop de forma limpa e o `recursion_limit` do grafo é só rede de segurança. O grafo gasta 4 super-steps por iteração — `before_model`, `model`, `after_model`, `tools` —, porque os hooks do middleware também são nós; o limite é calculado em cima disso.
 
-### Estado atual no repositório
+### Limitação conhecida — transações com data futura
 
-A app `ai` foi criada com `startapp` e registrada em `INSTALLED_APPS`, ainda com os arquivos padrão do Django (sem models, views ou tools). O agente especialista que conduzirá a implementação está documentado em `agents/ai.md`.
+O `current_balance` da conta soma **todas** as transações, sem filtro de data (`Account.update_account_balance()`), enquanto as tools do agente agregam com `date__lte=today`. Uma transação lançada com data futura entra no saldo e fica de fora dos totais por categoria e da série mensal.
+
+**Decidido manter assim** (02/08/2026): é o comportamento que o dashboard sempre teve, e alterá-lo exigiria mexer na agregação de saldo, que é central e coberta por testes. A inconsistência não é da IA — existiria em qualquer relatório construído sobre esses agregados.
+
+Efeito prático: quando existe transação com data futura, o agente tende a apontar a diferença no diagnóstico (ex.: "uma despesa de R$ 110,00 ainda não refletida nas categorias de gastos"). É observação correta sobre os dados, não alucinação.
+
+### Validação da conexão (T24.6)
+
+Chamada mínima via `python manage.py shell` em 02/08/2026: credencial aceita, `finish_reason=stop`, 13 tokens consumidos. O identificador `deepseek-chat` é um alias — o modelo que respondeu foi `deepseek-v4-flash`. O campo `model_name` do `AIAnalysis` grava o valor configurado, não o que a API devolve.
+
+### Execução real ponta a ponta
+
+Primeira análise gerada contra a API real em 02/08/2026, pelo botão do dashboard:
+
+| Métrica | Valor | Limite configurado |
+|---|---|---|
+| Situação | `success` | — |
+| Iterações do agente | 3 | 10 (`AI_AGENT_MAX_ITERATIONS`) |
+| Tokens consumidos | 9.065 | — |
+| Duração | 10,5 s | 60 s (`AI_AGENT_TIMEOUT_SECONDS`) |
+
+O fluxo completo — agente escolhendo as tools, tools consultando o ORM filtrado por usuário, saída estruturada validada pelo schema e persistência — funcionou como especificado. As margens contra os tetos de iteração e de timeout ficaram largas.
+
+> Referência de custo: uma análise ficou em torno de 9 mil tokens. É o número a considerar ao dimensionar a geração em lote.
 
 ---
 
@@ -671,6 +828,8 @@ A app `ai` foi criada com `startapp` e registrada em `INSTALLED_APPS`, ainda com
 | Campos de data | `DateTimeField(auto_now_add=True)` e `auto_now=True` em todos os models |
 | Valores monetários | `DecimalField(max_digits=10, decimal_places=2)` |
 | Segurança de dados | Toda query de listagem filtra por `user=request.user` |
+| Dados expostos à IA | Tools escopadas por closure; a assinatura vista pelo modelo nunca contém `user_id` |
+| Segredos | Lidos do ambiente / `.env`; nunca versionados nem escritos em log ou template |
 | Saldo de conta | Recalculado via signal a cada criação/edição/exclusão de transação |
 | Templates | Globais em `templates/` na raiz (não dentro das apps) |
 
@@ -680,7 +839,8 @@ A app `ai` foi criada com `startapp` e registrada em `INSTALLED_APPS`, ainda com
 
 | Arquivo | Conteúdo |
 |---|---|
-| `README.md` | Descrição, stack, instalação local, execução via Docker, comandos, estrutura, settings configuráveis |
+| `README.md` | Descrição, stack, instalação local, execução via Docker, comandos, agente de IA, estrutura, settings configuráveis |
+| `.env.example` | Chaves esperadas no `.env`, sem valores reais |
 | `CLAUDE.md` | Guia de desenvolvimento para Claude Code: comandos, arquitetura, convenções, design system |
 | `TASKS.md` | Lista completa de tarefas por sprint com status de conclusão |
 | `PRD.md` | Product Requirements Document com requisitos do produto |

@@ -1,0 +1,75 @@
+{% extends 'base_app.html' %}
+
+{% block app_title %}Análise de {{ analysis.created_at|date:"d/m/Y" }}{% endblock %}
+
+{% block page_content %}
+
+<div class="mb-6">
+    <a
+        href="{% url 'ai:analysis_list' %}"
+        class="text-sm text-violet-400 hover:text-violet-300 transition-colors duration-200"
+    >
+        &larr; Voltar ao histórico
+    </a>
+    <h1 class="text-2xl font-bold text-gray-100 mt-2">Análise Inteligente</h1>
+    <p class="text-sm text-gray-400 mt-1">
+        Gerada em {{ analysis.created_at|date:"d/m/Y" }} às {{ analysis.created_at|date:"H:i" }}
+    </p>
+</div>
+
+<div class="bg-gray-900 border border-gray-700 rounded-xl p-6 border-t-2 border-t-violet-500">
+
+    {% if analysis.is_success %}
+
+        <!-- Indicador de saúde financeira -->
+        <div class="flex flex-wrap items-center gap-3 mb-5">
+            <span class="text-4xl font-bold {{ analysis.health_text_class }}">{{ analysis.health_score }}</span>
+            <span class="{{ analysis.health_color_class }} border text-xs font-medium px-2 py-1 rounded-full">
+                {{ analysis.get_health_label_display }}
+            </span>
+            <span class="text-xs text-gray-500">
+                Período de {{ analysis.period_start|date:"d/m/Y" }} a {{ analysis.period_end|date:"d/m/Y" }}
+            </span>
+        </div>
+
+        <p class="text-sm text-gray-300 mb-6">{{ analysis.summary }}</p>
+
+        {% if analysis.insights %}
+            <h2 class="text-sm font-medium text-gray-400 mb-2">Insights</h2>
+            <ul class="space-y-1 mb-6 text-sm text-gray-300 list-disc list-inside">
+                {% for insight in analysis.insights %}
+                    <li>{{ insight }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        {% if analysis.tips %}
+            <h2 class="text-sm font-medium text-gray-400 mb-2">Dicas</h2>
+            <ul class="space-y-1 mb-6 text-sm text-gray-300 list-disc list-inside">
+                {% for tip in analysis.tips %}
+                    <li>{{ tip }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+    {% else %}
+
+        <div class="bg-rose-500/10 border border-rose-500/30 rounded-lg px-4 py-3 mb-6">
+            <p class="text-sm text-rose-300">
+                {{ analysis.error_message|default:"Não foi possível gerar a análise." }}
+            </p>
+        </div>
+
+    {% endif %}
+
+    <!-- Metadados da execução -->
+    <div class="flex flex-wrap gap-x-6 gap-y-2 pt-4 border-t border-gray-700 text-xs text-gray-500">
+        {% if analysis.model_name %}<span>Modelo: {{ analysis.model_name }}</span>{% endif %}
+        <span>Duração: {{ analysis.duration_ms }} ms</span>
+        <span>Iterações: {{ analysis.iterations }}</span>
+        <span>Tokens: {{ analysis.total_tokens }}</span>
+    </div>
+
+</div>
+
+{% endblock %}

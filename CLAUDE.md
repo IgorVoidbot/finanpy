@@ -22,6 +22,10 @@ python manage.py createsuperuser
 # Rodar testes
 python manage.py test
 python manage.py test users        # testes de um app específico
+
+# Gerar as análises de IA em lote (exige DEEPSEEK_API_KEY no .env)
+python manage.py run_ai_analysis
+python manage.py run_ai_analysis --dry-run
 ```
 
 ## Arquitetura
@@ -35,6 +39,7 @@ Projeto Django full-stack chamado **Finanpy**. O módulo de configuração globa
 | `accounts/` | Contas bancárias; `current_balance` recalculado a cada transação |
 | `categories/` | Categorias de transações; categorias padrão criadas via signal no User |
 | `transactions/` | Transações financeiras; atualiza `current_balance` do Account associado |
+| `ai/` | Agente de análise financeira (LangChain 1.0 + DeepSeek); model `AIAnalysis` |
 
 Templates globais ficam em `templates/` na raiz (não dentro das apps). A URL raiz é configurada em `core/urls.py`; cada app deve ter seu próprio `urls.py` incluído via `include()`.
 
@@ -55,11 +60,37 @@ User (AbstractUser, USERNAME_FIELD='email')
  ├── Profile (OneToOne)
  ├── Account (FK) — tipos: checking, savings, wallet, investment
  ├── Category (FK) — tipos: income, expense
- └── Transaction (FK) → também FK para Account e Category
+ ├── Transaction (FK) → também FK para Account e Category
+ └── AIAnalysis (FK) — análises de IA; status: success, error
 ```
 
 `Category` tem `unique_together = ['user', 'name', 'transaction_type']`.
 `Transaction` ordering padrão: `['-date', '-created_at']`.
+`AIAnalysis` também é FK para `User` (`related_name='ai_analyses'`), ordering `['-created_at']`.
+
+## App `ai` — agente de análise financeira
+
+Agente LangChain 1.0 com a API da DeepSeek que analisa os dados de **um usuário por execução** e grava o resultado em `AIAnalysis` (inclusive as falhas, com `status='error'`).
+
+| Módulo | Responsabilidade |
+|---|---|
+| `tools.py` | `build_tools(user)` — tools de leitura, somente ORM, escopadas por closure |
+| `prompts.py` | System prompt do consultor financeiro, em PT-BR |
+| `schemas.py` | `FinancialAnalysis` (Pydantic) — saída estruturada |
+| `agent.py` | `build_finance_agent(user)` — modelo + tools + prompt + teto de iterações |
+| `services.py` | `run_analysis_for_user(user)` — executa, mede, persiste, trata erro |
+| `management/commands/run_ai_analysis.py` | Geração em lote para os usuários ativos |
+
+Regras obrigatórias desta app:
+
+- **Isolamento por usuário é bloqueante.** O `user` é fixado no servidor por closure; a assinatura exposta ao modelo **nunca** contém `user_id`. Nenhuma tool aceita SQL livre — todo acesso é ORM com `filter(user=...)`.
+- Todo parâmetro vindo do modelo é validado e tem teto (`months`, `limit`).
+- **Nenhuma falha da IA pode quebrar o dashboard**: `run_analysis_for_user()` nunca propaga exceção, e a montagem do contexto do card na `DashboardView` fica dentro de `try/except`.
+- A chave da API nunca aparece em log, mensagem de erro ou template — `error_message` usa textos fixos.
+- Antes de mexer em código do LangChain, **consultar a documentação vigente via MCP context7** — não assumir APIs de memória.
+- Testes nunca chamam a API real: use o `FakeAgent` e as fixtures `fake_agent` / `ai_enabled` do `conftest.py`.
+
+Sem `DEEPSEEK_API_KEY` no ambiente, `AI_ANALYSIS_ENABLED` cai para `False` e a funcionalidade some da interface sem afetar nenhum outro fluxo.
 
 ## Design system
 

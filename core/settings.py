@@ -13,8 +13,26 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Loads environment variables from .env (never versioned)
+load_dotenv(BASE_DIR / '.env')
+
+
+def env_bool(name, default):
+    """Reads a boolean from the environment accepting 1/true/yes."""
+    return os.environ.get(name, default).strip().lower() in ('1', 'true', 'yes')
+
+
+def env_int(name, default):
+    """Reads an integer from the environment, falling back on invalid values."""
+    try:
+        return int(os.environ.get(name, default))
+    except (TypeError, ValueError):
+        return int(default)
 
 
 # Quick-start development settings - unsuitable for production
@@ -138,3 +156,25 @@ LOGOUT_REDIRECT_URL = '/'
 SECURE_BROWSER_XSS_FILTER = True
 X_CONTENT_TYPE_OPTIONS = 'nosniff'
 SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# AI financial analysis agent (app 'ai')
+# The API key must come from the environment / .env — never commit it.
+DEEPSEEK_API_KEY = os.environ.get('DEEPSEEK_API_KEY', '')
+
+# Model identifier used by ChatDeepSeek (see DeepSeek docs for the current id)
+DEEPSEEK_MODEL = os.environ.get('DEEPSEEK_MODEL', 'deepseek-chat')
+
+# Feature flag: the agent stays off while there is no API key configured
+AI_ANALYSIS_ENABLED = env_bool('AI_ANALYSIS_ENABLED', 'True') and bool(DEEPSEEK_API_KEY)
+
+# Minimum gap between on-demand analyses of the same user, in minutes
+AI_ANALYSIS_MIN_INTERVAL_MINUTES = env_int('AI_ANALYSIS_MIN_INTERVAL_MINUTES', 15)
+
+# Timeout of a single agent run, in seconds
+AI_AGENT_TIMEOUT_SECONDS = env_int('AI_AGENT_TIMEOUT_SECONDS', 60)
+
+# Maximum number of model calls in the agent loop
+AI_AGENT_MAX_ITERATIONS = env_int('AI_AGENT_MAX_ITERATIONS', 10)
+
+# Default window of months considered by the analysis
+AI_ANALYSIS_MONTHS_WINDOW = env_int('AI_ANALYSIS_MONTHS_WINDOW', 6)

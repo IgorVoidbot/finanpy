@@ -80,7 +80,15 @@ Alternativa ao setup local — não requer Python nem virtualenv na máquina, ap
 
 **Pré-requisitos:** Docker Engine 24+ e Docker Compose v2.
 
-**1. Suba a aplicação**
+**1. (Opcional) Configure o `.env`**
+
+```bash
+cp .env.example .env   # e preencha DEEPSEEK_API_KEY
+```
+
+O `docker-compose.yml` injeta o `.env` no container quando ele existe. Sem o arquivo, a aplicação sobe normalmente com a análise por IA desligada.
+
+**2. Suba a aplicação**
 
 ```bash
 docker compose up --build
@@ -88,7 +96,7 @@ docker compose up --build
 
 O container aplica as migrações automaticamente na inicialização e sobe o servidor de desenvolvimento. Acesse `http://localhost:8000/`.
 
-**2. Crie um superusuário** (em outro terminal, com o container rodando)
+**3. Crie um superusuário** (em outro terminal, com o container rodando)
 
 ```bash
 docker compose exec web python manage.py createsuperuser
@@ -113,6 +121,10 @@ docker compose down -v
 docker compose exec web python manage.py migrate
 docker compose exec web python manage.py createsuperuser
 docker compose exec web python manage.py shell
+
+# Gerar as análises de IA em lote (exige DEEPSEEK_API_KEY no .env)
+docker compose exec web python manage.py run_ai_analysis
+docker compose exec web python manage.py run_ai_analysis --dry-run
 
 # Rodar os testes dentro do container
 docker compose exec web pytest
@@ -164,6 +176,102 @@ python manage.py test categories
 python manage.py test transactions
 ```
 
+> A geração das análises de IA tem seção própria mais abaixo:
+> [Agente de IA](#agente-de-ia).
+
+---
+
+## Agente de IA
+
+Um agente especialista em finanças pessoais analisa os dados do usuário — contas,
+categorias e transações — e produz um diagnóstico em português brasileiro com
+resumo, insights, dicas e um índice de saúde financeira de 0 a 100. A última
+análise aparece em card no dashboard; o histórico completo fica em `/analises/`.
+
+Construído com **LangChain 1.0** e a **API da DeepSeek**. Toda a lógica vive na
+app `ai/`.
+
+> **Aviso de custo:** cada análise é uma execução de agente e consome tokens da
+> API da DeepSeek — tanto o botão do dashboard quanto o comando em lote. O
+> intervalo mínimo entre gerações do mesmo usuário (padrão de 15 minutos) e o
+> teto de iterações existem justamente para conter esse consumo.
+
+### Configurando a chave
+
+1. Crie uma conta em [platform.deepseek.com](https://platform.deepseek.com/) e
+   gere uma API key.
+2. Copie o arquivo de exemplo e preencha a chave:
+
+```bash
+cp .env.example .env
+```
+
+```bash
+# .env
+DEEPSEEK_API_KEY=sua-chave-aqui
+```
+
+O `.env` **não é versionado** (já está no `.gitignore`) e é carregado por
+`python-dotenv` no topo do `core/settings.py`. No Docker, o `docker-compose.yml`
+injeta o arquivo no container via `env_file`.
+
+**Sem a chave a aplicação sobe normalmente, com a análise por IA desligada:** o
+card não é renderizado, as rotas de geração recusam a execução e nenhum outro
+fluxo é afetado.
+
+### Variáveis disponíveis
+
+| Variável | Padrão | Descrição |
+|---|---|---|
+| `DEEPSEEK_API_KEY` | vazio | Chave da API DeepSeek. Sem ela a funcionalidade fica desligada. |
+| `DEEPSEEK_MODEL` | `deepseek-chat` | Identificador do modelo usado pelo `ChatDeepSeek`. |
+| `AI_ANALYSIS_ENABLED` | `True` | Liga/desliga a funcionalidade. Mesmo `True`, fica desligada sem a chave. |
+| `AI_ANALYSIS_MIN_INTERVAL_MINUTES` | `15` | Intervalo mínimo entre gerações sob demanda do mesmo usuário. |
+| `AI_AGENT_TIMEOUT_SECONDS` | `60` | Timeout de uma execução do agente. |
+| `AI_AGENT_MAX_ITERATIONS` | `10` | Teto de chamadas ao modelo no loop do agente. |
+| `AI_ANALYSIS_MONTHS_WINDOW` | `6` | Janela padrão de meses considerada na análise. |
+
+### Gerando análises
+
+Pela interface, o botão **"Gerar nova análise"** no card do dashboard ou na
+página de histórico.
+
+Em lote, o comando `run_ai_analysis` percorre **cada usuário ativo** e gera uma
+análise individual, usando somente os dados de cada um:
+
+```bash
+# Uma análise para cada usuário ativo
+python manage.py run_ai_analysis
+
+# Apenas um usuário
+python manage.py run_ai_analysis --user maria@example.com
+
+# Pular usuários que ainda não têm transações
+python manage.py run_ai_analysis --skip-empty
+
+# Listar quem seria processado, sem chamar a API
+python manage.py run_ai_analysis --dry-run
+```
+
+Dentro do container:
+
+```bash
+docker compose exec web python manage.py run_ai_analysis
+docker compose exec web python manage.py run_ai_analysis --dry-run
+```
+
+Uma falha em um usuário não interrompe os demais: o erro é gravado como uma
+análise com situação `error` e o comando segue para o próximo. Ao final é
+exibido o resumo com total processado, sucessos, falhas e tempo total.
+
+### Privacidade e isolamento
+
+Cada execução recebe **um usuário fixado no servidor**. As ferramentas de
+leitura do banco são criadas por closure já vinculadas a esse usuário e a
+assinatura exposta ao modelo não tem identificador de usuário — não há como o
+modelo pedir dados de outra pessoa. Nenhuma ferramenta aceita SQL livre: todo
+acesso passa pelo ORM do Django com `filter(user=...)`.
+
 ---
 
 ## Estrutura de diretórios
@@ -180,6 +288,13 @@ pyfinance/
 ├── accounts/               # Contas bancárias
 ├── categories/             # Categorias de transações (padrão criadas via signal)
 ├── transactions/           # Transações financeiras
+├── ai/                     # Agente de análise financeira (LangChain 1.0 + DeepSeek)
+│   ├── tools.py            # Tools de leitura escopadas por usuário
+│   ├── prompts.py          # System prompt do consultor financeiro
+│   ├── schemas.py          # FinancialAnalysis (saída estruturada)
+│   ├── agent.py            # build_finance_agent(user)
+│   ├── services.py         # run_analysis_for_user(user)
+│   └── management/commands/run_ai_analysis.py
 ├── templates/              # Templates globais (raiz do projeto)
 │   ├── base.html
 │   ├── base_auth.html
@@ -224,6 +339,13 @@ Todas as variáveis abaixo estão em `core/settings.py`.
 | `LOGOUT_REDIRECT_URL` | `'/'` | URL de redirecionamento após logout. |
 | `SECURE_BROWSER_XSS_FILTER` | `True` | Ativa header de proteção XSS no navegador. |
 | `SECURE_CONTENT_TYPE_NOSNIFF` | `True` | Impede sniffing de MIME type pelo navegador. |
+| `DEEPSEEK_API_KEY` | vazio | Chave da API DeepSeek, lida do ambiente. Ver [Agente de IA](#agente-de-ia). |
+| `DEEPSEEK_MODEL` | `'deepseek-chat'` | Identificador do modelo usado pelo `ChatDeepSeek`. |
+| `AI_ANALYSIS_ENABLED` | `True` | Feature flag do agente; desligada automaticamente sem a chave. |
+| `AI_ANALYSIS_MIN_INTERVAL_MINUTES` | `15` | Intervalo mínimo entre gerações sob demanda por usuário. |
+| `AI_AGENT_TIMEOUT_SECONDS` | `60` | Timeout de uma execução do agente. |
+| `AI_AGENT_MAX_ITERATIONS` | `10` | Teto de chamadas ao modelo no loop do agente. |
+| `AI_ANALYSIS_MONTHS_WINDOW` | `6` | Janela padrão de meses considerada na análise. |
 
 ### Configuração mínima para produção
 
