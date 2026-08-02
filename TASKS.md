@@ -515,29 +515,29 @@
 
 #### T26. Tools de acesso ao banco de dados
 
-- [ ] **T26.1** Criar `ai/tools.py` com a factory `build_tools(user)`
+- [X] **T26.1** Criar `ai/tools.py` com a factory `build_tools(user)`
   - O `user` é fixado por closure/`partial`; **a assinatura exposta ao modelo nunca recebe `user_id`**
   - Todas as tools são somente-leitura e usam exclusivamente o ORM do Django
-- [ ] **T26.2** Tool `get_financial_summary`
+- [X] **T26.2** Tool `get_financial_summary`
   - Saldo total das contas, entradas/saídas/balanço do mês corrente, nº de contas e de transações
-- [ ] **T26.3** Tool `get_accounts_overview`
+- [X] **T26.3** Tool `get_accounts_overview`
   - Lista de contas do usuário: nome, tipo (rótulo em PT-BR), saldo inicial e saldo atual
-- [ ] **T26.4** Tool `get_expenses_by_category`
+- [X] **T26.4** Tool `get_expenses_by_category`
   - Parâmetros: `months` (default da setting, teto de 24)
   - Agrupamento por categoria com total e percentual sobre as saídas do período
-- [ ] **T26.5** Tool `get_income_by_category`
+- [X] **T26.5** Tool `get_income_by_category`
   - Mesma estrutura da anterior, para entradas
-- [ ] **T26.6** Tool `get_monthly_totals`
+- [X] **T26.6** Tool `get_monthly_totals`
   - Série dos últimos N meses com entradas, saídas e balanço por mês
-- [ ] **T26.7** Tool `get_recent_transactions`
+- [X] **T26.7** Tool `get_recent_transactions`
   - Parâmetros: `limit` (default 20, teto 50); retorna data, descrição, categoria, conta, tipo e valor
-- [ ] **T26.8** Tool `get_largest_expenses`
+- [X] **T26.8** Tool `get_largest_expenses`
   - Maiores saídas do período, com teto de itens
-- [ ] **T26.9** Padronizar serialização dos retornos
+- [X] **T26.9** Padronizar serialização dos retornos
   - `Decimal` convertido para `float`/`str` antes de devolver ao modelo
   - Datas em ISO 8601; nenhum objeto Django cru no retorno
   - Validar e limitar todos os parâmetros vindos do modelo
-- [ ] **T26.10** Escrever docstrings descritivas em cada tool
+- [X] **T26.10** Escrever docstrings descritivas em cada tool
   - São elas que o modelo lê para decidir quando chamar cada tool — devem explicar o retorno e a unidade dos valores
 
 #### T27. Agente LangChain 1.0 + DeepSeek
