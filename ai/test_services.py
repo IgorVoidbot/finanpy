@@ -56,7 +56,9 @@ class TestRunAnalysis:
         ai_enabled.AI_AGENT_MAX_ITERATIONS = 4
         services.run_analysis_for_user(user_with_history)
 
-        assert fake_agent.calls[0]['config'] == {'recursion_limit': 10}
+        # 4 super-steps per iteration (before_model, model, after_model, tools)
+        # plus margin — the middleware must be what stops the loop, not this.
+        assert fake_agent.calls[0]['config'] == {'recursion_limit': 22}
 
     def test_disabled_flag_does_not_call_the_agent(self, user, settings, monkeypatch):
         settings.AI_ANALYSIS_ENABLED = False

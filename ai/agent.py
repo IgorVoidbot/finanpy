@@ -93,11 +93,27 @@ def build_finance_agent(user):
     )
 
 
+# Super-steps the graph spends on one iteration of the loop. The middleware
+# hooks are nodes too, so a full cycle is
+# `before_model` → `model` → `after_model` → `tools`.
+GRAPH_STEPS_PER_ITERATION = 4
+
+# Room for `__start__`, the final model call that answers without calling a
+# tool, and its `after_model` hook.
+GRAPH_STEPS_MARGIN = 6
+
+
 def build_run_config():
     """Graph-level safety net for the iteration cap.
 
-    The middleware is what normally stops the loop; the recursion limit covers
-    the model/tool round trips it does not count. Each iteration spends two
-    super-steps (model, then tools), plus a margin for the final answer.
+    The middleware is what should stop the loop — it ends the run cleanly,
+    while blowing the recursion limit aborts it with `GraphRecursionError`.
+    So this limit is deliberately set above what `AI_AGENT_MAX_ITERATIONS`
+    iterations can spend, and only catches a loop the middleware misses.
     """
-    return {'recursion_limit': 2 * settings.AI_AGENT_MAX_ITERATIONS + 2}
+    return {
+        'recursion_limit': (
+            GRAPH_STEPS_PER_ITERATION * settings.AI_AGENT_MAX_ITERATIONS
+            + GRAPH_STEPS_MARGIN
+        )
+    }
