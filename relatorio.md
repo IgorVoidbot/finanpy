@@ -711,7 +711,7 @@ docker compose exec web python manage.py run_ai_analysis
 
 ### Progresso geral
 
-Todo o escopo previsto está **entregue**, com uma pendência conhecida: a **T24.6** — validação de uma chamada real à API DeepSeek — depende de uma `DEEPSEEK_API_KEY` válida e permanece em aberto. Todo o caminho do agente foi exercitado com dublê, mas nenhuma execução real contra a API foi feita até aqui.
+Todo o escopo previsto está **entregue**, incluindo a **T24.6** (conexão com a API DeepSeek validada em 02/08/2026). Uma execução completa do agente contra a API real — análise ponta a ponta — ainda não foi feita: até aqui o fluxo inteiro foi exercitado com dublê.
 
 ---
 
@@ -788,9 +788,11 @@ Confirmadas via MCP context7 contra a versão instalada e registradas no docstri
 - **Testes sem rede**: a suíte substitui o agente por um dublê; nenhuma chamada real à API DeepSeek.
 - **Teto de iterações em duas camadas**: o middleware encerra o loop e o `recursion_limit` cobre os passos que ele não conta.
 
-### Pendência
+### Validação da conexão (T24.6)
 
-A **T24.6** — validação de uma chamada real à API DeepSeek — segue bloqueada por falta de uma `DEEPSEEK_API_KEY` válida no ambiente. Todo o restante foi exercitado com dublê.
+Chamada mínima via `python manage.py shell` em 02/08/2026: credencial aceita, `finish_reason=stop`, 13 tokens consumidos. O identificador `deepseek-chat` é um alias — o modelo que respondeu foi `deepseek-v4-flash`. O campo `model_name` do `AIAnalysis` grava o valor configurado, não o que a API devolve.
+
+Uma execução completa do agente contra a API real (análise ponta a ponta) ainda não foi feita — até aqui, todo o fluxo foi exercitado com dublê.
 
 ---
 

@@ -482,9 +482,10 @@
 - [X] **T24.5** Repassar a chave ao container
   - Adicionar `env_file: .env` ao serviço `web` no `docker-compose.yml`
   - Documentar que sem `.env` a funcionalidade sobe desligada
-- [ ] **T24.6** Validar conexão mínima com a API DeepSeek
+- [X] **T24.6** Validar conexão mínima com a API DeepSeek
   - Chamada única de teste via `python manage.py shell`, confirmando credencial e nome do modelo
-  - **Bloqueado:** depende de uma `DEEPSEEK_API_KEY` válida no `.env`
+  - Validado em 02/08/2026: credencial aceita, `finish_reason=stop`, 13 tokens
+  - `deepseek-chat` é alias — quem respondeu foi `deepseek-v4-flash`
 
 #### T25. Model `AIAnalysis` e persistência
 
